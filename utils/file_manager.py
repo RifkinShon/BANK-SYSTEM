@@ -23,11 +23,21 @@ class FileManager:
      else:
         print(f"JSON file '{self.file_path}' already exists.")
 
-    def save_data(self):
+    def save_data(self, new_data):
+        existing = self.load_data()
+        
+        if existing is None:       
+            existing = {}
+        
+        for key in new_data:
+            if key in existing:
+                existing[key].extend(new_data[key]) 
+            else:
+                existing[key] = new_data[key]        
+        
         with open(self.file_path, 'w') as file:
-                json.dump(self.data_dict, file, indent=2)
-                print(f"JSON file '{self.file_path}' has been saved successfully")
-                return
+            json.dump(existing, file, indent=2)
+            print(f"JSON file '{self.file_path}' has been saved successfully")
     def load_data(self):
         import json
         try:
@@ -55,6 +65,7 @@ class FileManager:
                 writer.writerows(task_list)
     @staticmethod
     def task_id(file_path_txt):
+        print
 
         try:
             # קריאה מהקובץ
@@ -84,14 +95,14 @@ class FileManager:
 
             # בודק שיש משימות קובץ  #
             import json
-            file_path = "tasks.json"
+            file_path = "files/transactions.json"
             try:
                 with open(file_path, 'r', encoding='utf-8') as file:
                     data = json.load(file)  # תיקון: לא להשתמש ב-file.read()
 
-                    # בודקים אם המפתח "tasks" קיים ומכיל רשימה
-                    if "tasks" in data and isinstance(data["tasks"], list):
-                        content = data["tasks"]
+                    # בודקים אם המפתח "transactions" קיים ומכיל רשימה
+                    if "transactions" in data and isinstance(data["transactions"], list):
+                        content = data["transactions"]
                     else:
                         content = []
             except (FileNotFoundError, PermissionError, json.JSONDecodeError):
@@ -112,20 +123,3 @@ class FileManager:
                 file.write(str(id_int_current_plus))
             print(f".txt file '{file_path_txt}' has been created successfully")
             return id_int_current
-
-
-
-dict_W={
-            "id": 65,
-            "title": "89",
-            "Description": "Milk, eggs, bread",
-            "status": "todo",
-            "creativeTime": "2026-03-05 10:30:00",
-            "UpdateTime": "2026-03-05 10:30:00"
-        }  
-
-F1=FileManager("JJ.json",{"tasks": []})
-F1.ensure_file_exists()
-F1.load_data()
-F1.json_to_csv()
-

@@ -1,0 +1,28 @@
+{
+  "accounts": [
+    {
+      "account_number": "356683476",
+      "ownerId": "123456789",
+      "account_holder": "John Doe",
+      "account_type": "CHECKING",
+      "balance": 9623219,
+      "status": "ACTIVE",
+      "daily_withdrawal_limit": 10621.65,
+      "transactions": [],
+      "credit_score": 845,
+      "created_time": "2026-03-07 "
+    },
+    {
+      "account_number": "356683476",
+      "ownerId": "123456789",
+      "account_holder": "John Doe",
+      "account_type": "CHECKING",
+      "balance": 9623219,
+      "status": "ACTIVE",
+      "daily_withdrawal_limit": 10621.65,
+      "transactions": [],
+      "credit_score": 845,
+      "created_time": "2026-03-07 "
+    }
+  ]
+}
