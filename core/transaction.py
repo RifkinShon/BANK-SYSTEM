@@ -12,37 +12,35 @@ class TransactionType(Enum):
 class TransactionStatus(Enum):
     COMPLETED = 1
     FAILED = 2
+class TransactionUtils:
+    @staticmethod
+    def time_now_update():
+        from datetime import datetime
+        now = datetime.now()
+        return now.strftime("%Y-%m-%d %H:%M")
 
-def time_now_update():
-    from datetime import datetime
-    now = datetime.now()
-    return now.strftime("%Y-%m-%d %H:%M")
+    @staticmethod
+    def amount(amount):
+        if not isinstance(amount, (int, float)):
+            raise ValueError("Amount must be a number.")
+        if amount < 0 :
+            raise ValueError("Amount must be greater than zero.")
+        return amount
+        
+    @staticmethod
+    def description(description):
 
-def amount(amount):
-    if not isinstance(amount, (int, float)):
-        raise ValueError("Amount must be a number.")
-    if amount < 0 :
-        raise ValueError("Amount must be greater than zero.")
-    return amount
-    
-
-def description(description):
-    if description:
-        return description
-    else:
-        raise ValueError("Description cannot be empty.")
+        if description:
+            return description
+        else:
+            raise ValueError("Description cannot be empty.")
+    @staticmethod
+    def transactionType(transaction_type):
+        if transaction_type in TransactionType:
+            return transaction_type
+        raise ValueError("Invalid transaction_type") 
 
 
-
-account_info = {
-    "account_number": "123",
-    "id": "45",
-    "account_holder": "John Doe",
-    "account_type": "Checking",
-    "balance": 1000,
-    "status": "Active",
-    "daily_withdrawal_limit": 500
-}
 
 
 
@@ -77,7 +75,7 @@ class Transaction:
             print("Insufficient balance in the account.failed.")
             return False
     def cheack_status_account(self):
-        if self.account_info["status"] == "Active":
+        if self.account_info["status"] == "ACTIVE" or self.account_info["status"] == "CLOSED":
             print("Account status is active.successful.")
             return True
         else:
@@ -93,12 +91,20 @@ class Transaction:
                 return True
         print("Daily withdrawal limit is insufficient.failed.")
         return False
+    def acount_type(self):
+        if self.account_info["account_type"] == "Checking":
+            print("Account type is checking.successful.")
+            return True
+        else:
+            print("Account type is not checking.failed.")
+            return False
     
     def cheack_status_transaction(self):
         calculate_amount_in_account=self.calculate_amount_in_account()
         cheack_status_account=self.cheack_status_account()
         cheack_daily_withdrawal_limit=self.cheack_daily_withdrawal_limit()
-        if calculate_amount_in_account and cheack_status_account and cheack_daily_withdrawal_limit:
+        acount_type=self.acount_type()
+        if acount_type and calculate_amount_in_account and cheack_status_account and cheack_daily_withdrawal_limit:
             self.status = TransactionStatus.COMPLETED
         else:
             self.status = TransactionStatus.FAILED
@@ -142,7 +148,14 @@ class TransactionTo(Transaction):
 
 
 
-T1=Transaction(transactionId=task_id("transactionId.txt"), amount=amount(100), transactionType=TransactionType.DEPOSIT, timestamp=time_now_update(), account_info=account_info, fee=7.5, status=TransactionStatus.COMPLETED, description=description("Initial deposit"))
+T1=Transaction(transactionId=task_id("transactionId.txt"),
+                amount=TransactionUtils.amount(100),
+                transactionType=TransactionUtils.transactionType(TransactionType.DEPOSIT),
+                timestamp=TransactionUtils.time_now_update(),
+                account_info=account_info,
+                fee=7.5,
+                status=TransactionStatus.COMPLETED,
+                description=TransactionUtils.description("Initial deposit"))
 
 T1.cheack_status_transaction()
 T1.change_balance(T1._amount)
