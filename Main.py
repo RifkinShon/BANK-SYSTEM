@@ -1,6 +1,5 @@
-from enum import Enum
 
-from core.transaction import Transaction,TransactionUtils
+from core.transaction import Transaction,TransactionTo,TransactionUtils
 from core.customer import Customer,CustomerUtils
 from core.account import AccountUtils, CheckingAccount, LoanAccount, SavingsAccount
 from utils.file_manager import FileManager 
@@ -45,55 +44,74 @@ elif account_type == "SAVINGS":
     savingsAccount = SavingsAccount(**common)
 elif account_type == "LOAN":
     loanAccount = LoanAccount(**common)
+transactionType="DEPOSIT"
+SR=True
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-print(common)
-T1=Transaction(transactionId=FileManager.task_id("files/transactionId.txt"),
-                amount=TransactionUtils.amount(100),
-                transactionType=TransactionUtils.transactionType("DEPOSIT"),
-                timestamp=TransactionUtils.time_now_update(),
-                account_info=CheckingAccount.to_dict_account(CheckingAccount(**common)),
-                fee=7.5,
-                status=TransactionUtils.transactionStatus("COMPLETED"),
-                description=TransactionUtils.description("Initial deposit"))
-
+if SR==False:
+    T1=Transaction(transactionId=FileManager.task_id("files/transactionId.txt"),
+                    amount=TransactionUtils.amount(69),
+                    transactionType=TransactionUtils.transactionType("WITHDRAWAL"),
+                    timestamp=TransactionUtils.time_now_update(),
+                    account_info=CheckingAccount.to_dict_account(CheckingAccount(**common)),
+                    fee=7.5,
+                    status=TransactionUtils.transactionStatus("COMPLETED"),
+                    description=TransactionUtils.description("Initial deposit")
+                    
+                    )
+else :
+    T1=TransactionTo(transactionId=FileManager.task_id("files/transactionId.txt"),
+                    amount=TransactionUtils.amount(69),
+                    transactionType=TransactionUtils.transactionType("TRANSFER"),
+                    timestamp=TransactionUtils.time_now_update(),
+                    account_info=CheckingAccount.to_dict_account(CheckingAccount(**common)),
+                    fee=7.5,
+                    status=TransactionUtils.transactionStatus("COMPLETED"),
+                    description=TransactionUtils.description("Initial deposit")
+                    ,account_number_To=TransactionUtils.account_number_To(356681990)
+                    )
 T1.cheack_status_transaction()
-T1.change_balance(T1._amount)
-
-
-
-
-checking_dict = CheckingAccount.to_dict_account(CheckingAccount(**common))
 transaction_dict = T1.to_dict_transaction()
-dict_customer = dict_customer
+
+print(f"Account Balance: {T1.account_info['balance']}")
+checking_dict = CheckingAccount.to_dict_account(CheckingAccount(**common))
+checking_dict["balance"] = T1.change_balance()
+checking_dict["transactions"].append(transaction_dict)
+
+if SR:
+    checking_dict_transference=T1.to_dict_account_transaction_TO()
+    checking_dict_transference["transactions"].append(T1.to_dict_transaction_TO())
+    TO_balance=T1.change_balance()
+    TO_balance=TO_balance[1]
+    print(f"{TO_balance}TO_balance")
+    transactionTO_dict=T1.to_dict_transaction_TO()
+    print(transactionTO_dict)
+    transactionTO_dict["balance"] = TO_balance
+
+
 
 customer = FileManager("files/customers.json", {"customers": [dict_customer]})
 accounts = FileManager("files/accounts.json", {"accounts": [checking_dict]})
 transactions = FileManager("files/transactions.json", {"transactions": [transaction_dict]})
 
-files_list = [customer, accounts, transactions]
+if SR:
+    accountsTO=FileManager("files/accounts.json", {"accounts": [checking_dict_transference]})
+    transactionsTO=FileManager("files/transactions.json", {"transactions": [transactionTO_dict]})
+
+    files_list = [customer, accounts,transactions,accountsTO,transactionsTO]
+else:
+        files_list = [customer, accounts,transactions]
+
+
+
 
 for file in files_list:
     file.ensure_file_exists()  
-customer.save_data({"customers": [dict_customer]})
-accounts.save_data({"accounts": [checking_dict]})
-transactions.save_data({"transactions": [transaction_dict]})
+customer.save_data()
+accounts.delete_data()
+accounts.save_data()
+transactions.save_data()
+if SR:
+ accountsTO.delete_data
+ accountsTO.save_data()
+ transactionsTO.save_data()
+

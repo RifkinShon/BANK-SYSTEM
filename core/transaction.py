@@ -1,13 +1,13 @@
 
 from datetime import datetime
 
+
 class TransactionUtils:
     @staticmethod
     def time_now_update():
         from datetime import datetime
         now = datetime.now()
         return now.strftime("%Y-%m-%d %H:%M")
-
     @staticmethod
     def amount(amount):
         if not isinstance(amount, (int, float)):
@@ -33,6 +33,13 @@ class TransactionUtils:
         if transaction_status in ["COMPLETED", "FAILED"]:
             return transaction_status
         raise ValueError("Invalid Transaction Status")
+    @staticmethod
+    def account_number_To(account_number_To):
+        star_account_number_To=str(account_number_To)
+        if  len(star_account_number_To) <= 9 and star_account_number_To[0:3]=="356":
+            return account_number_To
+        raise ValueError("num have to follow standard.")
+ 
 
 
 
@@ -40,31 +47,32 @@ class TransactionUtils:
 class Transaction:
     def __init__(self, transactionId, amount, transactionType, timestamp, account_info, fee, status, description):
         self.transactionId = transactionId
-        self._amount = amount                    
+        self.amount = amount                    
         self.transactionType = transactionType
         self.timestamp = timestamp
         self.account_info = account_info
-        self._fee = fee                          
+        self.fee = fee                          
         self.status = status               
         self.description = description
     
     def to_remove_transaction_from_info(self):
-        del self.account_info["transactions"]
+        if "transactions" in self.account_info:
+         del self.account_info["transactions"]
         return self.account_info
     def to_dict_transaction(self):
         account_info = self.to_remove_transaction_from_info()
         return {
             "transactionId": self.transactionId,
-            "amount": self._amount,
+            "amount": self.amount,
             "transactionType": self.transactionType,
             "timestamp": self.timestamp,
-            "fee": self._fee,
+            "fee": self.fee,
             "status": self.status,
             "description": self.description,
             "account_info": account_info,
         }   
     def calculate_amount_in_account(self):
-        if int(self.account_info["balance"]) >= self._amount+self._fee:
+        if int(self.account_info["balance"]) >= self.amount+self.fee:
             print("Sufficient balance in the account.successful.")
             return True
         else:
@@ -82,7 +90,7 @@ class Transaction:
             print("Daily withdrawal limit is not relevant for deposits.successful.")
             return True
         if self.transactionType == "WITHDRAWAL":
-            if self.account_info["daily_withdrawal_limit"] >= self._amount:
+            if self.account_info["daily_withdrawal_limit"] >= self.amount:
                 print("Daily withdrawal limit is sufficient.successful.")
                 return True
         print("Daily withdrawal limit is insufficient.failed.")
@@ -107,40 +115,84 @@ class Transaction:
 
 
 
-    def change_balance(self, amount):
-       cheack_status_transaction=self.cheack_status_transaction()
+    def change_balance(self):
+       print(f"{self.account_info["balance"]}balance before ") 
        if self.status == "COMPLETED":
         if self.transactionType == "DEPOSIT":
-         self.account_info["balance"] += amount
+         self.account_info["balance"] += self.amount
         elif self.transactionType == "WITHDRAWAL":
-         self.account_info["balance"] -= amount + self._fee
+         self.account_info["balance"] -= self.amount + self.fee
     
        balance = self.account_info["balance"]  
        print(balance)
        return balance
-# להוסיף שזה יוריד מהחשבון את הכסף        
+# להוסיף שזה יוריד מהחשבון את הכסף      
+# צריך שזה שזה ימחוק מילון עם אותו נתונים עם קיים וירשום את המילון החדש  
 
 
+
+
+print
 class TransactionTo(Transaction):
-    def __init__(self, transactionId, amount, transactionType, timestamp, account_info, fee, status, description, acount_info_To):
+    def __init__(self, transactionId, amount, transactionType, timestamp, account_info, fee, status, description, account_number_To):
         super().__init__(transactionId, amount, transactionType, timestamp, account_info, fee, status, description)
-        self.acount_info_To = acount_info_To
-
-    def to_dict(self):
-        data = super().to_dict()
-        data["acount_info_To"] = self.acount_info_To
+        self.account_number_To = account_number_To
+    def to_dict_transaction(self):
+        data = super().to_dict_transaction()
+        data["account_number_To"] = self.account_number_To
         return data
-    
-    def change_balance(self, amount):
+    def to_dict_transaction_TO(self):
+        data = super().to_dict_transaction()
+        account_info=self.account_info
+        data["account_number_To"] = account_info["account_number"]
+        data["fee"] = "0"
+        
+        return data
+
+    def to_dict_account_transaction_TO(self):
+        to_find_account_To=self.search_account_info_To()
+
+        return to_find_account_To[1]
+
+
+    def search_account_info_To(self):
+        import os
+        import sys
+        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from utils.file_manager import FileManager 
+        data = FileManager("files/accounts.json", {"accounts": []}).load_data()
+        for account in data["accounts"]:
+            
+            if account["account_number"] == str(self.account_number_To):
+                return True, account
+        
+        raise ValueError("account not found")
+
+
+
+
+
+    def change_balance(self):
+        to_find_account_To=self.search_account_info_To()
         if self.transactionType == "TRANSFER":
-            self.account_info["balance"] -= amount- self._fee
-            self.acount_info_To["balance"] += amount
-            return self.acount_info_To["balance"]
+            if self.status=="COMPLETED":
+                self.account_info["balance"] -= self.amount+ self.fee
+                to_find_account_To[1]["balance"] += self.amount
+                account_info=self.account_info["balance"]
+                return  account_info,to_find_account_To[1]["balance"]
+            else:
+                return  self.account_info["balance"],to_find_account_To[1]["balance"]
+
+
 # להוסיף שזה יוריד מהחשבון את הכסף        
-    def search_account_info_To(self, account_number):
-     pass    
 
-
+    def cheack_status_transaction(self):
+        super().cheack_status_transaction()
+        search_account_info_To=self.search_account_info_To()
+        if search_account_info_To[0]:
+            print("status is COMPLETED")
+            return
+        self.status = "FAILED"
 
 
 

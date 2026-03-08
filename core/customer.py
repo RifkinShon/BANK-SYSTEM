@@ -9,6 +9,7 @@ class CustomerUtils:
     def account_number():
         import random
         account_number="356"+str(random.randint(100,999999))
+        account_number=str(account_number)
         return account_number
         
     @staticmethod

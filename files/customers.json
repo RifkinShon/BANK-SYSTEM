@@ -6,11 +6,11 @@
       "age": 30,
       "email": "johndoe@gmail.com",
       "phone": "0501234567",
-      "account_number": "356683476",
+      "account_number": "356681990",
       "address": "123 Main St, City, Country",
       "role": "CLIENT",
-      "credit_score": 845,
-      "created_time": "2026-03-07 ",
+      "credit_score": 770,
+      "created_time": "2026-03-08 ",
       "account_type": "CHECKING"
     },
     {
@@ -19,11 +19,24 @@
       "age": 30,
       "email": "johndoe@gmail.com",
       "phone": "0501234567",
-      "account_number": "356683476",
+      "account_number": "356681990",
       "address": "123 Main St, City, Country",
       "role": "CLIENT",
-      "credit_score": 845,
-      "created_time": "2026-03-07 ",
+      "credit_score": 770,
+      "created_time": "2026-03-08 ",
+      "account_type": "CHECKING"
+    },
+    {
+      "customer_id": "123456789",
+      "name": "John Doe",
+      "age": 30,
+      "email": "johndoe@gmail.com",
+      "phone": "0501234567",
+      "account_number": "356778570",
+      "address": "123 Main St, City, Country",
+      "role": "CLIENT",
+      "credit_score": 670,
+      "created_time": "2026-03-08 ",
       "account_type": "CHECKING"
     }
   ]

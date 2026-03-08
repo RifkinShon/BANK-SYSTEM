@@ -36,9 +36,10 @@ class Account:
             "balance": self.balance,
             "status": self.status,
             "daily_withdrawal_limit": self.daily_withdrawal_limit,
-            "transactions": self.transactions,
             "credit_score": self.credit_score,
-            "created_time":self.created_time
+            "created_time":self.created_time,
+            "transactions": self.transactions,
+
         }      
     def freeze_account(self):
         self.status = "FROZEN"
@@ -56,6 +57,14 @@ class SavingsAccount(Account):
     def __init__(self, account_number,ownerId, account_holder, balance, status, daily_withdrawal_limit,transactions,credit_score,created_time):
         super().__init__(account_number,ownerId, account_holder, "SAVINGS", balance, status, daily_withdrawal_limit,transactions,credit_score,created_time)
     
+
+    def to_dict_account(self):
+        data = super().to_dict_account()
+        data["account_type"] = "SAVINGS"
+        if data["transactions"] in data:
+         del data["transactions"]
+        return data
+     
 
     
     
@@ -77,6 +86,15 @@ class LoanAccount(Account):
     def __init__(self, account_number,ownerId, account_holder, balance, status, daily_withdrawal_limit,transactions,credit_score,created_time):
         super().__init__(account_number,ownerId, account_holder, "LOAN", balance, status, daily_withdrawal_limit,transactions,credit_score,created_time)
     
+    def to_dict_account(self):
+        data = super().to_dict_account()
+        data["account_type"] = "LOAN"
+        if data["transactions"] in data:
+         del data["transactions"]
+        return data
+     
+
+
     def cumulate_interest(self, credit_score):
         yearly_interest = self.apply_yearly_intest_rate(self.created_time)
         self.balance += self.balance *(1/(credit_score*100))*yearly_interest
