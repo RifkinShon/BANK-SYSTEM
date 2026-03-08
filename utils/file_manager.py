@@ -23,49 +23,88 @@ class FileManager:
      else:
         print(f"JSON file '{self.file_path}' already exists.")
 
-    def save_data(self, new_data):
+    def save_data(self):
         existing = self.load_data()
         
         if existing is None:       
             existing = {}
+            print("there is no data")
         
-        for key in new_data:
+        for key in self.data_dict:
             if key in existing:
-                existing[key].extend(new_data[key]) 
+                existing[key].extend(self.data_dict[key]) 
             else:
-                existing[key] = new_data[key]        
+                existing[key] = self.data_dict[key]        
         
         with open(self.file_path, 'w') as file:
-            json.dump(existing, file, indent=2)
-            print(f"JSON file '{self.file_path}' has been saved successfully")
+                json.dump(existing, file, indent=2)
+                print(f"JSON file '{self.file_path}' has been saved successfully")
+                return
+
     def load_data(self):
         import json
         try:
             with open(self.file_path, 'r') as file:
-                self.data_dict = json.load(file)
+                data_dict = json.load(file)
                 print(f"Data loaded successfully from '{self.file_path}'")
-                return self.data_dict
+                return data_dict
         except FileNotFoundError:
             print(f"File '{self.file_path}' not found.")
             return None
         except json.JSONDecodeError:
             print(f"Error decoding JSON from file '{self.file_path}'.")
             return None
-    def json_to_csv(self): 
+    def delete_data(self):
+        existing = self.load_data()
         
-        import csv
-        csv_file_path = self.file_path.replace('.json', '.csv')
-        data_dict = self.load_data()
+        if existing is None:
+            print("No data found in file")
+            return
         
-        for key, task_list in data_dict.items():
-            headers = task_list[0].keys()
-            with open(csv_file_path, 'w', newline='') as f:
-                writer = csv.DictWriter(f, fieldnames=headers)
-                writer.writeheader()
-                writer.writerows(task_list)
+        # מוציא את account_number מתוך {"accounts": [checking_dict_transference]}
+        for key in self.data_dict:
+            if isinstance(self.data_dict[key], list):
+                account_to_delete = self.data_dict[key][0].get("account_number")
+                break
+        
+        for key in existing:
+            if isinstance(existing[key], list):
+                existing[key] = [
+                    item for item in existing[key]
+                    if item.get("account_number") != account_to_delete
+                ]
+        
+        with open(self.file_path, 'w') as file:
+            json.dump(existing, file, indent=2)
+            print(f"JSON file '{self.file_path}' has been deleted data successfully")
+            return
+        print((f"JSON file '{self.file_path}' has not deleted data successfully"))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def delete_file(self):
+        import os
+        try:
+            os.remove(self.file_path)
+            print(f"File '{self.file_path}' deleted successfully")
+        except FileNotFoundError:
+            print(f"File '{self.file_path}' not found")
+
     @staticmethod
     def task_id(file_path_txt):
-        print
+        
 
         try:
             # קריאה מהקובץ
@@ -123,3 +162,4 @@ class FileManager:
                 file.write(str(id_int_current_plus))
             print(f".txt file '{file_path_txt}' has been created successfully")
             return id_int_current
+

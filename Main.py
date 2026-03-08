@@ -36,7 +36,6 @@ common = {
     }
     
  
-
 account_type = dict_customer["account_type"]
 if account_type == "CHECKING":
     checkingAccount = CheckingAccount(**common)
@@ -44,15 +43,14 @@ elif account_type == "SAVINGS":
     savingsAccount = SavingsAccount(**common)
 elif account_type == "LOAN":
     loanAccount = LoanAccount(**common)
-transactionType="DEPOSIT"
 SR=True
-
+checking_dict=CheckingAccount.to_dict_account(CheckingAccount(**common))
 if SR==False:
     T1=Transaction(transactionId=FileManager.task_id("files/transactionId.txt"),
                     amount=TransactionUtils.amount(69),
                     transactionType=TransactionUtils.transactionType("WITHDRAWAL"),
                     timestamp=TransactionUtils.time_now_update(),
-                    account_info=CheckingAccount.to_dict_account(CheckingAccount(**common)),
+                    account_info=checking_dict,
                     fee=7.5,
                     status=TransactionUtils.transactionStatus("COMPLETED"),
                     description=TransactionUtils.description("Initial deposit")
@@ -63,30 +61,33 @@ else :
                     amount=TransactionUtils.amount(69),
                     transactionType=TransactionUtils.transactionType("TRANSFER"),
                     timestamp=TransactionUtils.time_now_update(),
-                    account_info=CheckingAccount.to_dict_account(CheckingAccount(**common)),
+                    account_info=checking_dict,
                     fee=7.5,
                     status=TransactionUtils.transactionStatus("COMPLETED"),
                     description=TransactionUtils.description("Initial deposit")
-                    ,account_number_To=TransactionUtils.account_number_To(356681990)
+                    ,account_number_To=TransactionUtils.account_number_To(356620657)
                     )
 T1.cheack_status_transaction()
 transaction_dict = T1.to_dict_transaction()
 
 print(f"Account Balance: {T1.account_info['balance']}")
 checking_dict = CheckingAccount.to_dict_account(CheckingAccount(**common))
-checking_dict["balance"] = T1.change_balance()
+balance_result = T1.change_balance()
+checking_dict["balance"] = balance_result[0] 
+T1.account_info = {k: v for k, v in checking_dict.items() if k != "transactions"}
 checking_dict["transactions"].append(transaction_dict)
 
+
 if SR:
-    checking_dict_transference=T1.to_dict_account_transaction_TO()
-    checking_dict_transference["transactions"].append(T1.to_dict_transaction_TO())
-    TO_balance=T1.change_balance()
-    TO_balance=TO_balance[1]
+    checking_dict_TO=T1.to_dict_account_transaction_TO()
+    TO_balance=balance_result[1]
+    checking_dict_TO["balance"]=TO_balance
     print(f"{TO_balance}TO_balance")
     transactionTO_dict=T1.to_dict_transaction_TO()
-    print(transactionTO_dict)
-    transactionTO_dict["balance"] = TO_balance
+    transactionTO_dict["account_info"]["balance"] =TO_balance
+    checking_dict_TO["transactions"].append(transactionTO_dict)
 
+    
 
 
 customer = FileManager("files/customers.json", {"customers": [dict_customer]})
@@ -94,7 +95,7 @@ accounts = FileManager("files/accounts.json", {"accounts": [checking_dict]})
 transactions = FileManager("files/transactions.json", {"transactions": [transaction_dict]})
 
 if SR:
-    accountsTO=FileManager("files/accounts.json", {"accounts": [checking_dict_transference]})
+    accountsTO=FileManager("files/accounts.json", {"accounts": [checking_dict_TO]})
     transactionsTO=FileManager("files/transactions.json", {"transactions": [transactionTO_dict]})
 
     files_list = [customer, accounts,transactions,accountsTO,transactionsTO]
@@ -106,12 +107,17 @@ else:
 
 for file in files_list:
     file.ensure_file_exists()  
-customer.save_data()
-accounts.delete_data()
-accounts.save_data()
-transactions.save_data()
+
 if SR:
- accountsTO.delete_data
+ customer.save_data()
+ accounts.save_data()
+ transactions.save_data()
+ accountsTO.delete_data()
  accountsTO.save_data()
  transactionsTO.save_data()
+
+else:
+    customer.save_data()
+    accounts.save_data()
+    transactions.save_data()
 

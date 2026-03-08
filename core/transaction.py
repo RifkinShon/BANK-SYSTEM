@@ -89,10 +89,11 @@ class Transaction:
         if self.transactionType == "DEPOSIT":
             print("Daily withdrawal limit is not relevant for deposits.successful.")
             return True
-        if self.transactionType == "WITHDRAWAL":
-            if self.account_info["daily_withdrawal_limit"] >= self.amount:
+        if self.transactionType == "WITHDRAWAL" or  self.transactionType == "TRANSFER" :
+            if self.account_info["daily_withdrawal_limit"] >= self.amount+self.fee:
                 print("Daily withdrawal limit is sufficient.successful.")
                 return True
+
         print("Daily withdrawal limit is insufficient.failed.")
         return False
     def acount_type(self):
@@ -125,7 +126,7 @@ class Transaction:
     
        balance = self.account_info["balance"]  
        print(balance)
-       return balance
+       return balance,None
 # להוסיף שזה יוריד מהחשבון את הכסף      
 # צריך שזה שזה ימחוק מילון עם אותו נתונים עם קיים וירשום את המילון החדש  
 
@@ -139,15 +140,29 @@ class TransactionTo(Transaction):
         self.account_number_To = account_number_To
     def to_dict_transaction(self):
         data = super().to_dict_transaction()
-        data["account_number_To"] = self.account_number_To
-        return data
+        new_data = {}
+        
+        for key, value in data.items():
+            if key == "account_info":
+                new_data["account_number_To"] =str( self.account_number_To)  # ← לפני description
+            new_data[key] = value
+        return new_data
     def to_dict_transaction_TO(self):
         data = super().to_dict_transaction()
-        account_info=self.account_info
-        data["account_number_To"] = account_info["account_number"]
-        data["fee"] = "0"
+        new_data = {}
         
-        return data
+        for key, value in data.items():
+            if key == "account_info":
+                new_data["account_number_To"] = str(self.account_info["account_number"])
+                # ← מסיר transactions מתוך account_info
+                new_data[key] = {k: v for k, v in self.account_info.items() if k != "transactions"}
+            else:
+                new_data[key] = value
+        
+        new_data["fee"] = 0
+        dictTO_account = self.search_account_info_To()
+        new_data["account_info"] = {k: v for k, v in dictTO_account[1].items() if k != "transactions"}
+        return new_data
 
     def to_dict_account_transaction_TO(self):
         to_find_account_To=self.search_account_info_To()
@@ -189,7 +204,10 @@ class TransactionTo(Transaction):
     def cheack_status_transaction(self):
         super().cheack_status_transaction()
         search_account_info_To=self.search_account_info_To()
-        if search_account_info_To[0]:
+        if self.status=="COMPLETED":
+         print(self.status)
+         print(f"{search_account_info_To[0]}search_account_info_To[0]----------------------------------")
+         if search_account_info_To[0]:
             print("status is COMPLETED")
             return
         self.status = "FAILED"
