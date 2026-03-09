@@ -1,4 +1,3 @@
-
 from datetime import datetime
 
 
@@ -182,7 +181,12 @@ class TransactionTo(Transaction):
                 return True, account
         
         raise ValueError("account not found")
+    
 
+    def not_same_account(self):
+        if int(self.account_info["account_number"])==int(self.account_number_To):
+            return False
+        return True
 
 
 
@@ -204,10 +208,9 @@ class TransactionTo(Transaction):
     def cheack_status_transaction(self):
         super().cheack_status_transaction()
         search_account_info_To=self.search_account_info_To()
+        not_same_account=self.not_same_account()
         if self.status=="COMPLETED":
-         print(self.status)
-         print(f"{search_account_info_To[0]}search_account_info_To[0]----------------------------------")
-         if search_account_info_To[0]:
+         if search_account_info_To[0] and not_same_account:
             print("status is COMPLETED")
             return
         self.status = "FAILED"

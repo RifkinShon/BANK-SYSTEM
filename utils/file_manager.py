@@ -17,7 +17,7 @@ class FileManager:
      if not os.path.exists(self.file_path):
          print(f"JSON file '{self.file_path}' does not exist. Creating a new file.")
          with open(self.file_path, 'w') as file:
-             json.dump(self.data_dict, file, indent=2)
+             json.dump({}, file, indent=2)
          print(f"JSON file '{self.file_path}' has been created successfully")
          return
      else:
@@ -54,6 +54,9 @@ class FileManager:
         except json.JSONDecodeError:
             print(f"Error decoding JSON from file '{self.file_path}'.")
             return None
+        
+
+
     def delete_data(self):
         existing = self.load_data()
         
@@ -76,7 +79,7 @@ class FileManager:
         
         with open(self.file_path, 'w') as file:
             json.dump(existing, file, indent=2)
-            print(f"JSON file '{self.file_path}' has been deleted data successfully")
+            print(f"JSON file '{self.file_path}'   deleted data successfully")
             return
         print((f"JSON file '{self.file_path}' has not deleted data successfully"))
 
@@ -162,4 +165,3 @@ class FileManager:
                 file.write(str(id_int_current_plus))
             print(f".txt file '{file_path_txt}' has been created successfully")
             return id_int_current
-

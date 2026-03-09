@@ -1,17 +1,51 @@
-from enum import Enum   
 from abc import abstractmethod
 
 
 class AccountUtils:
        @staticmethod
        def balance(account_type):
-           import random
-           if account_type == "CHECKING":
-               return random.randint(0, 10000000)
-           elif account_type == "SAVINGS":
-               return random.randint(0, 1000000)
-           elif account_type == "LOAN":
-               return random.randint(-5000, -1000)
+        import random
+        if account_type == "CHECKING":
+            ranges = [
+                (0, 500),
+                (500, 3000),
+                (3000, 10000),
+                (10000, 30000),
+                (30000, 100000),
+                (100000, 1000000),
+                (1000000, 50000000),
+                (50000000, 1000000000)
+            ]
+            weights = [2000, 2800, 2300, 1300, 800, 500, 190, 10]
+
+        elif account_type == "SAVINGS":
+            ranges = [
+                (0, 1000),
+                (1000, 10000),
+                (10000, 50000),
+                (50000, 200000),
+                (200000, 1000000),
+                (1000000, 10000000),
+                (10000000, 100000000),
+                (100000000, 10000000000)
+            ]
+            weights = [2500, 2800, 2200, 1200, 700, 300, 190, 10]
+
+        elif account_type == "LOAN":
+            ranges = [
+                (-5000, -1000),
+                (-20000, -5000),
+                (-100000, -20000),
+                (-400000, -100000),
+                (-1000000, -400000),
+                (-5000000, -1000000),
+                (-50000000, -5000000),
+                (-1000000000, -50000000)
+            ]
+            weights = [1500, 2500, 2500, 1800, 1000, 400, 190, 10]
+        selected_range = random.choices(ranges, weights=weights, k=1)[0]
+        return random.randint(selected_range[0], selected_range[1])
+
            
 @abstractmethod
 class Account:
@@ -116,5 +150,3 @@ class LoanAccount(Account):
                 self.status = "CLOSED"
         else:
             raise ValueError("Payment amount must be greater than zero.")
-
-        

@@ -14,27 +14,25 @@ import sys
 # מוסיף את תיקיית הבסיס של הפרויקט ל-PATH
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from utils.file_manager import FileManager
-
-def search_account_info_To():
-    account_number_To = "356270209"
+def BANK_MONEY(fee,transactionType):
+    import json
+    import os
+    if transactionType =="DEPOSIT":
+        return
+    file_path = "files/BANK_MONEY.json"
     
-    # נתיב מדויק לקובץ לפי מבנה הפרויקט
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    json_path = os.path.join(base_dir, "files", "accounts.json")
+    # יוצר קובץ אם לא קיים
+    if not os.path.exists(file_path):
+        with open(file_path, 'w') as file:
+            json.dump({"BANK_MONEY": [{"total": 0}]}, file, indent=2)
     
-    data = FileManager(json_path, {"accounts": []}).load_data()
+    # טוען
+    with open(file_path, 'r') as file:
+        existing = json.load(file)
     
-    for account in data["accounts"]:
-        print(account)
-        time.sleep(4)
-        
-        if account["account_number"] == account_number_To:
-            return True, account
+    # מוסיף את העמלה
+    existing["BANK_MONEY"][0]["total"] += fee
     
-    print("account not found")
-    return False, None
-
-result = search_account_info_To()
-print(result[0])
-print(result[1])
+    # שומר
+    with open(file_path, 'w') as file:
+        json.dump(existing, file, indent=2)

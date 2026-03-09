@@ -75,12 +75,22 @@ class CustomerUtils:
             return account_type
         raise ValueError("Invalid Account Type")
     @staticmethod
-    def cheack_login(self, account_number, password):
-        if self.account_number == account_number and self.password == password:
-            print("Login successful.")
-            return True
-        return False
-#להוסיף שזה יבדוק עם יש מילון בל סיסמה כזה ומספר חשבון
+    def login(account_number,password):
+        import os
+        import sys
+        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from utils.file_manager import FileManager 
+        data = FileManager("files/customers.json", {"customers": []}).load_data()
+        for customer in data["customers"]:
+            if customer["account_number"] == str(account_number):
+                print("customers account is correct")
+                if str(customer["password"]) == str(password):
+                    print("customers password is correct")
+                    print("Login successful.")
+                    return  customer
+        raise ValueError("account number or password not correct")
+
+        
 
 
 class Customer:
@@ -106,14 +116,32 @@ class Customer:
         print("Converting Customer object to dictionary.")
         return {
             "customer_id": self.customer_id,
+            "account_number": self.account_number,
+            "password":self.password,
             "name": self.name,
             "age": self.age,
             "email": self.email,
             "phone": self.phone,
-            "account_number": self.account_number,
             "address": self.address,
             "role": self.role,
             "credit_score": self.credit_score,
             "created_time": self.created_time,
             "account_type": self.account_type,
         }
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            customer_id=data["customer_id"],
+            name=data["name"],
+            age=data["age"],
+            email=data["email"],
+            phone=data["phone"],
+            account_number=data["account_number"],
+            created_time=data["created_time"],
+            account_type=data["account_type"],
+            address=data["address"],
+            role=data["role"],
+            credit_score=data["credit_score"],
+            password=data["password"]
+        )
+    

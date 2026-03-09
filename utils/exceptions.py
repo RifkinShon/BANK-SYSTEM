@@ -9,3 +9,11 @@ raise PermissionError("אין הרשאה")     # אין הרשאה
 raise TimeoutError("פג תוקף")          # פג תוקף
 raise NotImplementedError("לא ממומש")  # פונקציה שעוד לא ממומשת
 raise RuntimeError("שגיאת ריצה") 
+
+def BANK_MONEY():
+    BANK_MONEY=FileManager("files/BANK_MONEY.json",{"BANK_MONEY": [BANK_MONEY_dict]})
+    bANK_MONEY["BANK MONEY"] += self.fee
+    BANK_MONEY.load_data
+    מוסיף את הערך שבdata לבנק money 
+    BANK_MONEY.save_data
+
