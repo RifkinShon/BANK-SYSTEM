@@ -35,7 +35,7 @@ class TransactionUtils:
     @staticmethod
     def account_number_To(account_number_To):
         star_account_number_To=str(account_number_To)
-        if  len(star_account_number_To) <= 9 and star_account_number_To[0:3]=="356":
+        if  len(star_account_number_To) <= 11 and star_account_number_To[0:3]=="356":
             return account_number_To
         raise ValueError("num have to follow standard.")
  
@@ -184,7 +184,7 @@ class TransactionTo(Transaction):
     
 
     def not_same_account(self):
-        if int(self.account_info["account_number"])==int(self.account_number_To):
+        if self.account_info["account_number"]==self.account_number_To:
             return False
         return True
 

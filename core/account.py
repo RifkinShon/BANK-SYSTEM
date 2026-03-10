@@ -2,8 +2,8 @@ from abc import abstractmethod
 
 
 class AccountUtils:
-       @staticmethod
-       def balance(account_type):
+    @staticmethod
+    def balance(account_type):
         import random
         if account_type == "CHECKING":
             ranges = [
@@ -45,6 +45,45 @@ class AccountUtils:
             weights = [1500, 2500, 2500, 1800, 1000, 400, 190, 10]
         selected_range = random.choices(ranges, weights=weights, k=1)[0]
         return random.randint(selected_range[0], selected_range[1])
+       
+
+    @staticmethod
+    def search_accounts(account_number):
+            import os
+            import sys
+            sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            from utils.file_manager import FileManager
+            data = FileManager("files/accounts.json", {"accounts": []}).load_data()
+
+            checking = None
+            savings = None
+            loan = None
+
+            for account in data["accounts"]:
+                if account["account_number"] == str(account_number):
+                    account_type = account["account_type"].upper()
+
+                    if account_type == "CHECKING" and checking is None:
+                        checking = account
+                    elif account_type == "SAVINGS" and savings is None:
+                        savings = account
+                    elif account_type == "LOAN" and loan is None:
+                        loan = account
+
+                if checking and savings and loan:
+                    break
+
+            result = {
+                "CHECKING": checking,
+                "SAVINGS": savings,
+                "LOAN": loan
+            }
+
+            missing = [k for k, v in result.items() if v is None]
+            if missing:
+                raise ValueError(f"לא נמצאו חשבונות מהסוגים: {', '.join(missing)}")
+
+            return  result  
 
            
 @abstractmethod
@@ -86,17 +125,33 @@ class Account:
 class CheckingAccount(Account):
     def __init__(self, account_number,ownerId, account_holder, balance, status, daily_withdrawal_limit,transactions,credit_score,created_time):
         super().__init__(account_number,ownerId, account_holder, "CHECKING", balance, status, daily_withdrawal_limit,transactions,credit_score,created_time)
+        self.account_number=account_number+"-C"
+    @classmethod
+    def from_dict_checking(cls, data):
+        return cls(
+            account_number=data["account_number"],
+            ownerId=data["ownerId"],
+            account_holder=data["account_holder"],
+            account_type="CHECKING",
+            balance=data["balance"],
+            status=data["status"],
+            daily_withdrawal_limit=data["daily_withdrawal_limit"],
+            transactions=data["transactions"],
+            credit_score=data["credit_score"],
+            created_time=data["created_time"]
+        )
+
+
 
 class SavingsAccount(Account):
     def __init__(self, account_number,ownerId, account_holder, balance, status, daily_withdrawal_limit,transactions,credit_score,created_time):
         super().__init__(account_number,ownerId, account_holder, "SAVINGS", balance, status, daily_withdrawal_limit,transactions,credit_score,created_time)
+        self.account_number=account_number+"-S"
     
 
     def to_dict_account(self):
         data = super().to_dict_account()
         data["account_type"] = "SAVINGS"
-        if data["transactions"] in data:
-         del data["transactions"]
         return data
      
 
@@ -112,19 +167,39 @@ class SavingsAccount(Account):
     def apply_monthly_intest_rate(self,created_time):
         from datetime import datetime
         now = datetime.now()
-        date=now.strftime("%Y-%m")
-        start_date=created_time[5:7]
-        monthly_interest=abs(int(date) - int(start_date))
+        
+        start_year = int(created_time[:4])
+        start_month = int(created_time[5:7])
+        
+        monthly_interest = (now.year - start_year) * 12 + (now.month - start_month)
         return monthly_interest
+    
+
+
+
+    @classmethod
+    def from_dict_savings(cls, data):
+        return cls(
+            account_number=data["account_number"],
+            ownerId=data["ownerId"],
+            account_holder=data["account_holder"],
+            account_type="SAVINGS",
+            balance=data["balance"],
+            status=data["status"],
+            daily_withdrawal_limit=data["daily_withdrawal_limit"],
+            transactions=data["transactions"],
+            credit_score=data["credit_score"],
+            created_time=data["created_time"]
+        )
+
 class LoanAccount(Account):
     def __init__(self, account_number,ownerId, account_holder, balance, status, daily_withdrawal_limit,transactions,credit_score,created_time):
         super().__init__(account_number,ownerId, account_holder, "LOAN", balance, status, daily_withdrawal_limit,transactions,credit_score,created_time)
-    
+        self.account_number=account_number+"-C"
+
     def to_dict_account(self):
         data = super().to_dict_account()
         data["account_type"] = "LOAN"
-        if data["transactions"] in data:
-         del data["transactions"]
         return data
      
 
@@ -150,3 +225,19 @@ class LoanAccount(Account):
                 self.status = "CLOSED"
         else:
             raise ValueError("Payment amount must be greater than zero.")
+        
+
+    @classmethod
+    def from_dict_loan(cls, data):
+        return cls(
+            account_number=data["account_number"],
+            ownerId=data["ownerId"],
+            account_holder=data["account_holder"],
+            account_type="LOAN",
+            balance=data["balance"],
+            status=data["status"],
+            daily_withdrawal_limit=data["daily_withdrawal_limit"],
+            transactions=data["transactions"],
+            credit_score=data["credit_score"],
+            created_time=data["created_time"]
+        )

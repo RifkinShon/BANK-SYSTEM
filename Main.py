@@ -16,7 +16,7 @@ def transaction_type(SR):
      return SR
 
 login_or_create=login_or_create(False)
-transaction_type=transaction_type(False)
+transaction_type=transaction_type(True)
 
 
 
@@ -26,15 +26,15 @@ transaction_type=transaction_type(False)
 #---------
 if login_or_create:
     data=CustomerUtils.login(356619064,1235643223)
-    Customer1 = Customer.from_dict(data) 
-    dict_customer_login=Customer1.to_dict_customer()
+    customer = Customer.from_dict(data) 
+    dict_customer_login=customer.to_dict_customer()
     customer_login = FileManager("files/customers.json", {"customers": [dict_customer_login]})
     customer_login.delete_data()
 
 
 
 else:
-    Customer1 = Customer(
+    customer = Customer(
         customer_id=CustomerUtils.id_number("123456789"),
         name=CustomerUtils.name("John Doe"),
         age=CustomerUtils.age(30),
@@ -46,9 +46,9 @@ else:
         role=CustomerUtils.customerRole("CLIENT"),
         credit_score=CustomerUtils.credit_score(),
         created_time=CustomerUtils.created_time(),
-        account_type=CustomerUtils.account_type("CHECKING")
     )
-dict_customer=Customer1.to_dict_customer()
+    
+dict_customer=customer.to_dict_customer()
 
     
 
@@ -56,32 +56,61 @@ dict_customer=Customer1.to_dict_customer()
  #----------
 #Account
 #---------   
+if  login_or_create:
+    loged_accounts_data=AccountUtils.search_accounts(account_number)
+    checking_dict=loged_accounts_data[0]
+    saving_dict=loged_accounts_data[1]
+    loan_dict=loged_accounts_data[2]
+    checkingAccount=CheckingAccount.from_dict_savings(checking_dict)
+    savingsAccount=SavingsAccount.from_dict_savings(saving_dict)
+    loanAccount=LoanAccount.from_dict_loan(loan_dict)
 
-common = {
-        "account_number": dict_customer["account_number"],
-        "ownerId": dict_customer["customer_id"],
-        "account_holder": dict_customer["name"],
-        "balance": AccountUtils.balance(dict_customer["account_type"]),
-        "status": "ACTIVE",
-        "daily_withdrawal_limit": dict_customer["credit_score"] * 12.57,
-        "transactions": [],
-        "credit_score": dict_customer["credit_score"],
-        "created_time": dict_customer["created_time"]
-    }
+    checking = FileManager("files/customers.json", {"accounts": [checking_dict]})
+    saving = FileManager("files/accounts.json", {"accounts": [saving_dict]})
+    loan = FileManager("files/transactions.json", {"accounts": [loan_dict]})
     
+    checking.delete_data()
+    saving.delete_data()
+    loan.delete_data()
+
+
+
     
+else:
+    common = {
+            "account_number": dict_customer["account_number"],
+            "ownerId": dict_customer["customer_id"],
+            "account_holder": dict_customer["name"],
+            "status": "ACTIVE",
+            "daily_withdrawal_limit": dict_customer["credit_score"] * 12.57,
+            "transactions": [],
+            "credit_score": dict_customer["credit_score"],
+            "created_time": dict_customer["created_time"]
+        }
+        
+        
 
-account_type = dict_customer["account_type"]
-if account_type == "CHECKING":
-    checkingAccount = CheckingAccount(**common)
-elif account_type == "SAVINGS":
-    savingsAccount = SavingsAccount(**common)
-elif account_type == "LOAN":
-    loanAccount = LoanAccount(**common)
 
+checkingAccount = CheckingAccount(**common,
+    balance=AccountUtils.balance("CHECKING")
+)
 
-checking_dict=CheckingAccount.to_dict_account(CheckingAccount(**common))
+savingsAccount = SavingsAccount(**{**common, "transactions": []},  # ← רשימה חדשה
+    balance=AccountUtils.balance("SAVINGS")
+)
 
+loanAccount = LoanAccount(**{**common, "transactions": []},        # ← רשימה חדשה
+    balance=AccountUtils.balance("LOAN")
+)
+
+checking_dict=checkingAccount.to_dict_account()
+saving_dict=savingsAccount.to_dict_account()
+loan_dict=loanAccount.to_dict_account()
+#מקשר בין המילוןים
+accounts_link=[checking_dict,saving_dict,loan_dict]
+#-------------------------------
+#-------------------------------------
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 common_transaction = {
     "transactionId": FileManager.task_id("files/transactionId.txt"),
     "amount": TransactionUtils.amount(69),
@@ -103,7 +132,7 @@ if transaction_type:
         T1 = TransactionTo(
         **common_transaction,
         transactionType=TransactionUtils.transactionType("TRANSFER"),
-        account_number_To=TransactionUtils.account_number_To(356619064)
+        account_number_To=TransactionUtils.account_number_To("356818697-S")
     )
 
 else:
@@ -120,7 +149,7 @@ if transaction_type:
     transaction_dict = T1.to_dict_transaction()
 
     print(f"Account Balance: {T1.account_info['balance']}")
-    checking_dict = CheckingAccount.to_dict_account(CheckingAccount(**common))
+    checking_dict = checkingAccount.to_dict_account()
     balance_result = T1.change_balance()
     checking_dict["balance"] = balance_result[0] 
     T1.account_info = {k: v for k, v in checking_dict.items() if k != "transactions"}
@@ -136,11 +165,16 @@ if transaction_type:
     
 
     customer = FileManager("files/customers.json", {"customers": [dict_customer]})
-    accounts = FileManager("files/accounts.json", {"accounts": [checking_dict]})
+
+    account_checking = FileManager("files/accounts.json", {"accounts": [checking_dict]})
+    account_saving = FileManager("files/accounts.json", {"accounts": [saving_dict]})
+    account_loan = FileManager("files/accounts.json", {"accounts": [loan_dict]})
+
+
     transactions = FileManager("files/transactions.json", {"transactions": [transaction_dict]})
     accountsTO=FileManager("files/accounts.json", {"accounts": [checking_dict_TO]})
     transactionsTO=FileManager("files/transactions.json", {"transactions": [transactionTO_dict]})
-    files_list = [customer, accounts,transactions,accountsTO,transactionsTO]
+    files_list = [customer,account_checking ,account_saving,account_loan,transactions,accountsTO,transactionsTO]
     
 
 
@@ -149,7 +183,12 @@ if transaction_type:
      file.ensure_file_exists()  
 
     customer.save_data()
-    accounts.save_data()
+    account_checking.save_data()
+    account_checking.save_data()
+    if saving_dict["account_number"] != checking_dict_TO["account_number"]:
+        account_saving.save_data()
+    if loan_dict["account_number"] != checking_dict_TO["account_number"]:
+        account_loan.save_data()
     transactions.save_data()
     accountsTO.delete_data()
     accountsTO.save_data()
@@ -168,7 +207,7 @@ else:
     transaction_dict = T1.to_dict_transaction()
 
     print(f"Account Balance: {T1.account_info['balance']}")
-    checking_dict = CheckingAccount.to_dict_account(CheckingAccount(**common))
+    checking_dict = checkingAccount.to_dict_account()
     balance_result = T1.change_balance()
     checking_dict["balance"] = balance_result[0] 
     T1.account_info = {k: v for k, v in checking_dict.items() if k != "transactions"}
@@ -179,15 +218,22 @@ else:
     #FileManager
     #--------- 
     customer = FileManager("files/customers.json", {"customers": [dict_customer]})
-    accounts = FileManager("files/accounts.json", {"accounts": [checking_dict]})
+
+    account_checking = FileManager("files/accounts.json", {"accounts": [checking_dict]})
+    account_saving = FileManager("files/accounts.json", {"accounts": [saving_dict]})
+    account_loan = FileManager("files/accounts.json", {"accounts": [loan_dict]})
+
     transactions = FileManager("files/transactions.json", {"transactions": [transaction_dict]})
 
-    files_list = [customer, accounts,transactions]
+    files_list = [customer, account_checking,transactions]
     for file in files_list:
         file.ensure_file_exists()  
 
     customer.save_data()
-    accounts.save_data()
+    account_checking.save_data()
+    account_saving.save_data()
+    account_loan.save_data()
+
     transactions.save_data()
 
 

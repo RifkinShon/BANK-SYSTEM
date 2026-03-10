@@ -95,7 +95,7 @@ class CustomerUtils:
 
 class Customer:
     
-    def __init__(self, customer_id, name,age, email, phone, account_number,created_time,account_type, address,password, role,credit_score):
+    def __init__(self, customer_id, name,age, email, phone, account_number,created_time, address,password, role,credit_score):
         self.customer_id = customer_id
         self.name = name
         self.age=age
@@ -103,7 +103,6 @@ class Customer:
         self.phone = phone
         self.account_number = account_number
         self.created_time = created_time
-        self.account_type=account_type
         self.address = address
         self.role = role
         self.credit_score=credit_score
@@ -126,7 +125,6 @@ class Customer:
             "role": self.role,
             "credit_score": self.credit_score,
             "created_time": self.created_time,
-            "account_type": self.account_type,
         }
     @classmethod
     def from_dict(cls, data):

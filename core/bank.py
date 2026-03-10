@@ -7,7 +7,6 @@ if args.name:
     print(f"שלום {args.name}!")
 #מערכת פקודודות שיכולה לערוך את קבצי הjson ויכולת להפיל גם את הcvs"""
 
-import time
 import os
 import sys
 
