@@ -99,6 +99,9 @@ class Transaction:
         if self.account_info["account_type"] == "CHECKING":
             print("Account type is checking.successful.")
             return True
+        elif self.account_info["account_type"] == "SAVINGS" and self.account_info["status"] == "CLOSED":
+            print("Account type is saving and it is closed.successful.")
+            return True
         else:
             print("Account type is not checking.failed.")
             return False

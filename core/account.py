@@ -49,41 +49,41 @@ class AccountUtils:
 
     @staticmethod
     def search_accounts(account_number):
-            import os
-            import sys
-            sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            from utils.file_manager import FileManager
-            data = FileManager("files/accounts.json", {"accounts": []}).load_data()
+        import os
+        import sys
+        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from utils.file_manager import FileManager
+        data = FileManager("files/accounts.json", {"accounts": []}).load_data()
 
-            checking = None
-            savings = None
-            loan = None
+        checking = None
+        savings = None
+        loan = None
 
-            for account in data["accounts"]:
-                if account["account_number"] == str(account_number):
-                    account_type = account["account_type"].upper()
+        for account in data["accounts"]:
+            if account["account_number"].split("-")[0] == str(account_number):
+                account_type = account["account_type"].upper()
+                account_without_type = {k: v for k, v in account.items() if k != "account_type"}
 
-                    if account_type == "CHECKING" and checking is None:
-                        checking = account
-                    elif account_type == "SAVINGS" and savings is None:
-                        savings = account
-                    elif account_type == "LOAN" and loan is None:
-                        loan = account
+                if account_type == "CHECKING" and checking is None:
+                    checking = account_without_type
+                elif account_type == "SAVINGS" and savings is None:
+                    savings = account_without_type
+                elif account_type == "LOAN" and loan is None:
+                    loan = account_without_type
 
-                if checking and savings and loan:
-                    break
+            if checking and savings and loan:
+                break
+        result = {
+            "CHECKING": checking,
+            "SAVINGS": savings,
+            "LOAN": loan
+        }
 
-            result = {
-                "CHECKING": checking,
-                "SAVINGS": savings,
-                "LOAN": loan
-            }
+        missing = [k for k, v in result.items() if v is None]
+        if missing:
+            raise ValueError(f"No accounts of the following types were found: {', '.join(missing)}")
 
-            missing = [k for k, v in result.items() if v is None]
-            if missing:
-                raise ValueError(f"לא נמצאו חשבונות מהסוגים: {', '.join(missing)}")
-
-            return  result  
+        return result
 
            
 @abstractmethod
@@ -125,14 +125,19 @@ class Account:
 class CheckingAccount(Account):
     def __init__(self, account_number,ownerId, account_holder, balance, status, daily_withdrawal_limit,transactions,credit_score,created_time):
         super().__init__(account_number,ownerId, account_holder, "CHECKING", balance, status, daily_withdrawal_limit,transactions,credit_score,created_time)
-        self.account_number=account_number+"-C"
+        if "-C" in str(account_number):
+            self.account_number = account_number
+        else:
+         self.account_number = account_number + "-C"  
+
+
+
     @classmethod
     def from_dict_checking(cls, data):
         return cls(
-            account_number=data["account_number"],
+            account_number=data["account_number"].replace("-S", ""),
             ownerId=data["ownerId"],
             account_holder=data["account_holder"],
-            account_type="CHECKING",
             balance=data["balance"],
             status=data["status"],
             daily_withdrawal_limit=data["daily_withdrawal_limit"],
@@ -146,8 +151,10 @@ class CheckingAccount(Account):
 class SavingsAccount(Account):
     def __init__(self, account_number,ownerId, account_holder, balance, status, daily_withdrawal_limit,transactions,credit_score,created_time):
         super().__init__(account_number,ownerId, account_holder, "SAVINGS", balance, status, daily_withdrawal_limit,transactions,credit_score,created_time)
-        self.account_number=account_number+"-S"
-    
+        if "-S" in str(account_number):
+             self.account_number = account_number
+        else:
+         self.account_number=account_number+"-S"
 
     def to_dict_account(self):
         data = super().to_dict_account()
@@ -183,7 +190,6 @@ class SavingsAccount(Account):
             account_number=data["account_number"],
             ownerId=data["ownerId"],
             account_holder=data["account_holder"],
-            account_type="SAVINGS",
             balance=data["balance"],
             status=data["status"],
             daily_withdrawal_limit=data["daily_withdrawal_limit"],
@@ -195,7 +201,11 @@ class SavingsAccount(Account):
 class LoanAccount(Account):
     def __init__(self, account_number,ownerId, account_holder, balance, status, daily_withdrawal_limit,transactions,credit_score,created_time):
         super().__init__(account_number,ownerId, account_holder, "LOAN", balance, status, daily_withdrawal_limit,transactions,credit_score,created_time)
-        self.account_number=account_number+"-C"
+        if "-L" in str(account_number):
+             self.account_number = account_number
+        else:
+         self.account_number=account_number+"-L"
+
 
     def to_dict_account(self):
         data = super().to_dict_account()
@@ -233,7 +243,6 @@ class LoanAccount(Account):
             account_number=data["account_number"],
             ownerId=data["ownerId"],
             account_holder=data["account_holder"],
-            account_type="LOAN",
             balance=data["balance"],
             status=data["status"],
             daily_withdrawal_limit=data["daily_withdrawal_limit"],

@@ -136,7 +136,6 @@ class Customer:
             phone=data["phone"],
             account_number=data["account_number"],
             created_time=data["created_time"],
-            account_type=data["account_type"],
             address=data["address"],
             role=data["role"],
             credit_score=data["credit_score"],

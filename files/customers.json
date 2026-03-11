@@ -2,7 +2,7 @@
   "customers": [
     {
       "customer_id": "123456789",
-      "account_number": "356882291",
+      "account_number": "356822024",
       "password": 1235643223,
       "name": "John Doe",
       "age": 30,
@@ -10,9 +10,8 @@
       "phone": "0501234567",
       "address": "123 Main St, City, Country",
       "role": "CLIENT",
-      "credit_score": 632,
+      "credit_score": 715,
       "created_time": "2026-03-11 "
     }
-    
   ]
 }
