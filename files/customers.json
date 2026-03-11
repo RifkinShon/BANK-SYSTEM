@@ -103,6 +103,32 @@
       "role": "CLIENT",
       "credit_score": 588,
       "created_time": "2026-03-11 "
+    },
+    {
+      "customer_id": "123456789",
+      "account_number": "356896814",
+      "password": 1235643223,
+      "name": "John Doe",
+      "age": 30,
+      "email": "johndoe@gmail.com",
+      "phone": "0501234567",
+      "address": "123 Main St, City, Country",
+      "role": "CLIENT",
+      "credit_score": 636,
+      "created_time": "2026-03-12 "
+    },
+    {
+      "customer_id": "123456789",
+      "account_number": "356377672",
+      "password": 1235643223,
+      "name": "John Doe",
+      "age": 30,
+      "email": "johndoe@gmail.com",
+      "phone": "0501234567",
+      "address": "123 Main St, City, Country",
+      "role": "CLIENT",
+      "credit_score": 329,
+      "created_time": "2026-03-12 "
     }
   ]
 }

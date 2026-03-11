@@ -34,6 +34,33 @@ class BANK:
         
         with open(file_path, 'w') as file:
             json.dump(existing, file, indent=2)
+    @staticmethod
+    def loan_money(amount):
+        import os
+        import sys
+        import json
+        import os
+
+        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
+    
+        file_path = "files/BANK_MONEY.json"
+        
+        if not os.path.exists(file_path):
+            with open(file_path, 'w') as file:
+                json.dump({"BANK_MONEY": [{"total": 0}]}, file, indent=2)
+        
+        with open(file_path, 'r') as file:
+            existing = json.load(file)
+        
+        existing["BANK_MONEY"][0]["total"] += amount
+        
+        with open(file_path, 'w') as file:
+            json.dump(existing, file, indent=2)
+        print(f"{amount} of loan money got added to the BANK")
+        return
+
 
     @staticmethod
     def loan_interest():
@@ -146,6 +173,7 @@ class BANK:
             with open("files/accounts.json", "w") as f:
                 json.dump(data, f, indent=2)
             print("Interest rates updated successfully")
-if __name__ == "__main__":          
+if __name__ == "__main__":    
+    BANK.loan_money(6900000)      
     BANK.loan_interest()
     BANK.saving_interest()

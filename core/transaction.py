@@ -195,12 +195,15 @@ class TransactionTo(Transaction):
 
 
     def change_balance(self):
+        from core.BANK import BANK
         to_find_account_To=self.search_account_info_To()
         if self.transactionType == "TRANSFER":
             if self.status=="COMPLETED":
                 self.account_info["balance"] -= self.amount+ self.fee
                 to_find_account_To[1]["balance"] += self.amount
                 account_info=self.account_info["balance"]
+                if to_find_account_To[1]["account_type"]=="LOAN":#פונקציה שנותנת לבנק את הכסף מהלוואה
+                    BANK.loan_money(self.amount)
                 return  account_info,to_find_account_To[1]["balance"]
             else:
                 return  self.account_info["balance"],to_find_account_To[1]["balance"]

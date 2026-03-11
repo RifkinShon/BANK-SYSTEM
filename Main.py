@@ -16,7 +16,7 @@ def transaction_type(SR):
      return SR
 
 login_or_create=login_or_create(False)
-transaction_type=transaction_type(False)
+transaction_type=transaction_type(True)
 
 
 
@@ -148,7 +148,7 @@ if transaction_type:
         T1 = TransactionTo(
         **common_transaction,
         transactionType=TransactionUtils.transactionType("TRANSFER"),
-        account_number_To=TransactionUtils.account_number_To("356822024-S")
+        account_number_To=TransactionUtils.account_number_To("356725531-L")
     )
 
 else:
@@ -182,10 +182,10 @@ if transaction_type:
     #----------
     #FileManager
     #--------- 
-
-    checking.delete_data()
-    saving.delete_data()
-    loan.delete_data()
+    if  login_or_create:
+        checking.delete_data()
+        saving.delete_data()
+        loan.delete_data()
 
 
     customer = FileManager("files/customers.json", {"customers": [dict_customer]})
