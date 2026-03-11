@@ -2,7 +2,7 @@
 from core.transaction import Transaction,TransactionTo,TransactionUtils
 from core.customer import Customer,CustomerUtils
 from core.account import AccountUtils, CheckingAccount, LoanAccount, SavingsAccount
-from core.BANK import BANK_MONEY
+from core.BANK import BANK
 from utils.file_manager import FileManager 
 
 def login_or_create(RS):
@@ -16,7 +16,7 @@ def transaction_type(SR):
      return SR
 
 login_or_create=login_or_create(False)
-transaction_type=transaction_type(True)
+transaction_type=transaction_type(False)
 
 
 
@@ -25,11 +25,12 @@ transaction_type=transaction_type(True)
 #Customer
 #---------
 if login_or_create:
-    data=CustomerUtils.login(356619064,1235643223)
+    data=CustomerUtils.login("356822024",1235643223)
     customer = Customer.from_dict(data) 
     dict_customer_login=customer.to_dict_customer()
     customer_login = FileManager("files/customers.json", {"customers": [dict_customer_login]})
     customer_login.delete_data()
+
 
 
 
@@ -57,21 +58,34 @@ dict_customer=customer.to_dict_customer()
 #Account
 #---------   
 if  login_or_create:
-    loged_accounts_data=AccountUtils.search_accounts(account_number)
-    checking_dict=loged_accounts_data[0]
-    saving_dict=loged_accounts_data[1]
-    loan_dict=loged_accounts_data[2]
-    checkingAccount=CheckingAccount.from_dict_savings(checking_dict)
+    loged_accounts_data=AccountUtils.search_accounts("356822024")
+    checking_dict = loged_accounts_data["CHECKING"]
+    checking_dict["account_type"] = "CHECKING"
+
+    saving_dict = loged_accounts_data["SAVINGS"]
+    saving_dict["account_type"] = "SAVINGS"
+
+    loan_dict = loged_accounts_data["LOAN"]
+    loan_dict["account_type"] = "LOAN"
+
+    checking_dict_deletion=checking_dict
+    saving_dict_deletion=saving_dict
+    loan_dict_deletion=loan_dict
+
+
+    
+
+
+
+    checkingAccount=CheckingAccount.from_dict_checking(checking_dict)
     savingsAccount=SavingsAccount.from_dict_savings(saving_dict)
     loanAccount=LoanAccount.from_dict_loan(loan_dict)
 
-    checking = FileManager("files/customers.json", {"accounts": [checking_dict]})
-    saving = FileManager("files/accounts.json", {"accounts": [saving_dict]})
-    loan = FileManager("files/transactions.json", {"accounts": [loan_dict]})
+    checking = FileManager("files/accounts.json", {"accounts": [checking_dict_deletion]})
+    saving = FileManager("files/accounts.json", {"accounts": [saving_dict_deletion]})
+    loan = FileManager("files/accounts.json", {"accounts": [loan_dict_deletion]})
     
-    checking.delete_data()
-    saving.delete_data()
-    loan.delete_data()
+
 
 
 
@@ -85,32 +99,34 @@ else:
             "daily_withdrawal_limit": dict_customer["credit_score"] * 12.57,
             "transactions": [],
             "credit_score": dict_customer["credit_score"],
-            "created_time": dict_customer["created_time"]
+            "created_time": dict_customer["created_time"],
+            "updata_time": dict_customer["created_time"] 
         }
         
         
 
 
-checkingAccount = CheckingAccount(**common,
-    balance=AccountUtils.balance("CHECKING")
-)
+    checkingAccount = CheckingAccount(**common,
+        balance=AccountUtils.balance("CHECKING")
+    )
 
-savingsAccount = SavingsAccount(**{**common, "transactions": []},  # ← רשימה חדשה
-    balance=AccountUtils.balance("SAVINGS")
-)
+    savingsAccount = SavingsAccount(**{**common, "transactions": []},  # ← רשימה חדשה
+        balance=AccountUtils.balance("SAVINGS")
+    )
 
-loanAccount = LoanAccount(**{**common, "transactions": []},        # ← רשימה חדשה
-    balance=AccountUtils.balance("LOAN")
-)
+    loanAccount = LoanAccount(**{**common, "transactions": []},        # ← רשימה חדשה
+        balance=AccountUtils.balance("LOAN")
+    )
 
-checking_dict=checkingAccount.to_dict_account()
-saving_dict=savingsAccount.to_dict_account()
-loan_dict=loanAccount.to_dict_account()
+    checking_dict=checkingAccount.to_dict_account()
+    saving_dict=savingsAccount.to_dict_account()
+    loan_dict=loanAccount.to_dict_account()
 #מקשר בין המילוןים
 accounts_link=[checking_dict,saving_dict,loan_dict]
 #-------------------------------
 #-------------------------------------
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#להוסיף בui שאם יש raise זה מחזיר חשבנות מחוקים
 common_transaction = {
     "transactionId": FileManager.task_id("files/transactionId.txt"),
     "amount": TransactionUtils.amount(69),
@@ -132,7 +148,7 @@ if transaction_type:
         T1 = TransactionTo(
         **common_transaction,
         transactionType=TransactionUtils.transactionType("TRANSFER"),
-        account_number_To=TransactionUtils.account_number_To("356818697-S")
+        account_number_To=TransactionUtils.account_number_To("356822024-S")
     )
 
 else:
@@ -163,6 +179,14 @@ if transaction_type:
     checking_dict_TO["transactions"].append(transactionTO_dict)
 
     
+    #----------
+    #FileManager
+    #--------- 
+
+    checking.delete_data()
+    saving.delete_data()
+    loan.delete_data()
+
 
     customer = FileManager("files/customers.json", {"customers": [dict_customer]})
 
@@ -183,7 +207,6 @@ if transaction_type:
      file.ensure_file_exists()  
 
     customer.save_data()
-    account_checking.save_data()
     account_checking.save_data()
     if saving_dict["account_number"] != checking_dict_TO["account_number"]:
         account_saving.save_data()
@@ -217,6 +240,7 @@ else:
     #----------
     #FileManager
     #--------- 
+
     customer = FileManager("files/customers.json", {"customers": [dict_customer]})
 
     account_checking = FileManager("files/accounts.json", {"accounts": [checking_dict]})
@@ -243,4 +267,4 @@ else:
 #----------
 #FileManager
 #--------- 
-BANK_MONEY(T1.fee,T1.transactionType)
+BANK.BANK_MONEY(T1.fee,T1.transactionType)

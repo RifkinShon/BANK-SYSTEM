@@ -88,7 +88,7 @@ class AccountUtils:
            
 @abstractmethod
 class Account:
-    def __init__(self, account_number,ownerId, account_holder, account_type, balance, status, daily_withdrawal_limit,transactions,credit_score,created_time):
+    def __init__(self, account_number,ownerId, account_holder, account_type, balance, status, daily_withdrawal_limit,transactions,credit_score,created_time,updata_time):
         self.account_number = account_number
         self.ownerId=ownerId
         self.account_holder = account_holder
@@ -99,6 +99,7 @@ class Account:
         self.transactions=transactions
         self.credit_score=credit_score
         self.created_time=created_time
+        self.updata_time=updata_time
 
     def to_dict_account(self):
         return {
@@ -111,6 +112,7 @@ class Account:
             "daily_withdrawal_limit": self.daily_withdrawal_limit,
             "credit_score": self.credit_score,
             "created_time":self.created_time,
+            "updata_time":self.updata_time,
             "transactions": self.transactions,
 
         }      
@@ -123,8 +125,8 @@ class Account:
 
 
 class CheckingAccount(Account):
-    def __init__(self, account_number,ownerId, account_holder, balance, status, daily_withdrawal_limit,transactions,credit_score,created_time):
-        super().__init__(account_number,ownerId, account_holder, "CHECKING", balance, status, daily_withdrawal_limit,transactions,credit_score,created_time)
+    def __init__(self, account_number,ownerId, account_holder, balance, status, daily_withdrawal_limit,transactions,credit_score,created_time,updata_time):
+        super().__init__(account_number,ownerId, account_holder, "CHECKING", balance, status, daily_withdrawal_limit,transactions,credit_score,created_time,updata_time)
         if "-C" in str(account_number):
             self.account_number = account_number
         else:
@@ -143,14 +145,15 @@ class CheckingAccount(Account):
             daily_withdrawal_limit=data["daily_withdrawal_limit"],
             transactions=data["transactions"],
             credit_score=data["credit_score"],
-            created_time=data["created_time"]
+            created_time=data["created_time"],
+            updata_time=data["updata_time"]
         )
 
 
 
 class SavingsAccount(Account):
-    def __init__(self, account_number,ownerId, account_holder, balance, status, daily_withdrawal_limit,transactions,credit_score,created_time):
-        super().__init__(account_number,ownerId, account_holder, "SAVINGS", balance, status, daily_withdrawal_limit,transactions,credit_score,created_time)
+    def __init__(self, account_number,ownerId, account_holder, balance, status, daily_withdrawal_limit,transactions,credit_score,created_time,updata_time):
+        super().__init__(account_number,ownerId, account_holder, "SAVINGS", balance, status, daily_withdrawal_limit,transactions,credit_score,created_time,updata_time)
         if "-S" in str(account_number):
              self.account_number = account_number
         else:
@@ -195,12 +198,13 @@ class SavingsAccount(Account):
             daily_withdrawal_limit=data["daily_withdrawal_limit"],
             transactions=data["transactions"],
             credit_score=data["credit_score"],
-            created_time=data["created_time"]
+            created_time=data["created_time"],
+            updata_time=data["updata_time"]
         )
 
 class LoanAccount(Account):
-    def __init__(self, account_number,ownerId, account_holder, balance, status, daily_withdrawal_limit,transactions,credit_score,created_time):
-        super().__init__(account_number,ownerId, account_holder, "LOAN", balance, status, daily_withdrawal_limit,transactions,credit_score,created_time)
+    def __init__(self, account_number,ownerId, account_holder, balance, status, daily_withdrawal_limit,transactions,credit_score,created_time,updata_time):
+        super().__init__(account_number,ownerId, account_holder, "LOAN", balance, status, daily_withdrawal_limit,transactions,credit_score,created_time,updata_time)
         if "-L" in str(account_number):
              self.account_number = account_number
         else:
@@ -217,7 +221,7 @@ class LoanAccount(Account):
     def cumulate_interest(self, credit_score):
         yearly_interest = self.apply_yearly_intest_rate(self.created_time)
         self.balance += self.balance *(1/(credit_score*100))*yearly_interest
-        if self.balance<0:
+        if self.balance<=0:
            self.status = "CLOSED"
 
         
@@ -228,6 +232,9 @@ class LoanAccount(Account):
         start_date=created_time[1:4]
         yearly_interest=abs(int(date) - int(start_date))
         return yearly_interest
+    
+
+
     def make_payment(self, payment_amount):
         if payment_amount > 0:
             self.balance -= payment_amount
@@ -235,6 +242,11 @@ class LoanAccount(Account):
                 self.status = "CLOSED"
         else:
             raise ValueError("Payment amount must be greater than zero.")
+        
+        
+    def close_loan(self):
+        if self.balance<=0:
+            self.status = "CLOSED"
         
 
     @classmethod
@@ -248,5 +260,6 @@ class LoanAccount(Account):
             daily_withdrawal_limit=data["daily_withdrawal_limit"],
             transactions=data["transactions"],
             credit_score=data["credit_score"],
-            created_time=data["created_time"]
+            created_time=data["created_time"],
+            updata_time=data["updata_time"]
         )
