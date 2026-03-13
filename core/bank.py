@@ -1,11 +1,3 @@
-"""import argparse
-
-parser = argparse.ArgumentParser()
-parser.add_argument("--name", help="שמך")
-args: Namespace = parser.parse_args()
-if args.name:
-    print(f"שלום {args.name}!")
-#מערכת פקודודות שיכולה לערוך את קבצי הjson ויכולת להפיל גם את הcvs"""
 class BANK:
 
 
@@ -174,6 +166,5 @@ class BANK:
                 json.dump(data, f, indent=2)
             print("Interest rates updated successfully")
 if __name__ == "__main__":    
-    BANK.loan_money(6900000)      
     BANK.loan_interest()
     BANK.saving_interest()
