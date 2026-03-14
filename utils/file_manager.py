@@ -105,6 +105,40 @@ class FileManager:
         except FileNotFoundError:
             print(f"File '{self.file_path}' not found")
 
+
+    def edit_data(self):
+        existing = self.load_data()
+        
+        if existing is None:
+            print("No data found in file")
+            return
+        
+        # מוציא את account_number, attribute, value מתוך self.data_dict
+        for key in self.data_dict:
+            if isinstance(self.data_dict[key], list):
+                account_number = self.data_dict[key][0].get("account_number")
+                attribute = self.data_dict[key][0].get("attribute")
+                value = self.data_dict[key][0].get("value")
+                break
+        
+        found = False
+        for key in existing:
+            if isinstance(existing[key], list):
+                for item in existing[key]:
+                    if item.get("account_number") == account_number:
+                        item[attribute] = value  # ← מחליף את הערך
+                        found = True
+        
+        if not found:
+            print(f"Account '{account_number}' not found in '{self.file_path}'")
+            return
+        
+        with open(self.file_path, 'w') as file:
+            json.dump(existing, file, indent=2)
+            print(f"JSON file '{self.file_path}' edited successfully")
+
+
+
     @staticmethod
     def task_id(file_path_txt):
         

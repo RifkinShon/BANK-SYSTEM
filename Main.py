@@ -16,7 +16,7 @@ def transaction_type(SR):
      return SR
 
 login_or_create=login_or_create(False)
-transaction_type=transaction_type(True)
+transaction_type=transaction_type(False)
 
 
 

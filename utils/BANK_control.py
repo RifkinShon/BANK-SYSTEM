@@ -2,6 +2,7 @@ import argparse
 from argparse import Namespace
 
 # Command system for editing JSON and CSV files
+print("# Command system for BANK system")
 parser = argparse.ArgumentParser(
     description="Command system for editing JSON and CSV files"
 )
@@ -35,19 +36,183 @@ parser.add_argument(
     "-uf","--un_freeze",
     help="Unfreezes an account based on its account number"
 )
-
 parser.add_argument(
-    "-c","--close ",
+    "-c","--close",
     help="Close an account based on its number"
 )
 
 parser.add_argument(
-    "-v","--view ",
+    "-a","--activate",
+    help="Close an account based on its number"
+)
+parser.add_argument(
+    "-v","--view",
     help="Looking at the file contents",
+    choices=["A", "B", "C", "T", "T_ID"]
+)
+
+parser.add_argument(
+    "-vw","--view_web",
+    help="Looking at the file contents in html",
     choices=["A", "B", "C", "T", "T_ID"]
 )
 
 args: Namespace = parser.parse_args()
 
-if args.name:
-    print(f"Hello {args.name}!")
+
+if args.deletion:
+    from file_manager import FileManager
+
+    FILE_PATHS = {
+        "A": "files/accounts.json",
+        "C": "files/customers.json",
+        "T": "files/transactions.json"
+    }
+
+    file_key, account_number = args.deletion
+
+    if file_key not in FILE_PATHS:
+        print("Error: Invalid file key. Choose A (accounts), C (customers), or T (transactions).")
+    else:
+        file_path = FILE_PATHS[file_key]
+        deletion_dict = FileManager(file_path, {"deletion": [{"account_number": account_number}]})
+        deletion_dict.delete_data()
+
+if args.deletion_file:
+    from file_manager import FileManager
+
+    FILE_PATHS = {
+        "A": "files/accounts.json",
+        "C": "files/customers.json",
+        "T": "files/transactions.json",
+        "B": "files/BANK_MONEY.json",
+        "T_ID": "files/transactionId.txt"
+    }
+
+
+    file_key = args.deletion_file  # ← תוקן מ-args.deletion
+
+    if file_key not in FILE_PATHS:
+        print("Error: Invalid file key. Choose A, C, T, B, or T_ID.")
+    else:
+        file_path = FILE_PATHS[file_key]
+        deletion_dict = FileManager(file_path, {})
+        deletion_dict.delete_file()
+
+
+
+if args.edit:
+    from file_manager import FileManager
+
+    FILE_PATHS = {
+        "A": "files/accounts.json",
+        "C": "files/customers.json",
+        "T": "files/transactions.json",
+    }
+
+    file_key = args.edit[0]
+    account_number = args.edit[1]
+    attribute = args.edit[2]
+    value = args.edit[3]
+
+    if file_key not in FILE_PATHS:
+        print("Error: Invalid file key. Choose A, C, T")
+    else:
+        file_path = FILE_PATHS[file_key]
+        edit_dict = FileManager(file_path, {"edit": [{"account_number": account_number, "attribute": attribute, "value": value}]})
+        edit_dict.edit_data()
+
+
+if args.freeze:
+    from file_manager import FileManager
+    account_number = args.freeze
+    edit_dict = FileManager("files/accounts.json", {"edit": [{"account_number": account_number, "attribute": "status", "value": "FROZEN"}]})
+    edit_dict.edit_data()
+
+if args.un_freeze:
+    from file_manager import FileManager
+    account_number = args.un_freeze
+    edit_dict = FileManager("files/accounts.json", {"edit": [{"account_number": account_number, "attribute": "status", "value": "ACTIVE"}]})
+    edit_dict.edit_data()
+
+if args.close:
+    from file_manager import FileManager
+    account_number = args.close
+    edit_dict = FileManager("files/accounts.json", {"edit": [{"account_number": account_number, "attribute": "status", "value": "CLOSED"}]})
+    edit_dict.edit_data()
+
+if args.activate:
+    from file_manager import FileManager
+    account_number = args.activate
+    edit_dict = FileManager("files/accounts.json", {"edit": [{"account_number": account_number, "attribute": "status", "value": "ACTIVE"}]})
+    edit_dict.edit_data()
+
+
+
+if args.view:
+    from pprint import pprint
+    import json
+
+    FILE_PATHS = {
+        "A": "files/accounts.json",
+        "C": "files/customers.json",
+        "T": "files/transactions.json",
+        "B": "files/BANK_MONEY.json",
+    }
+
+    file_key = args.view
+
+    if file_key not in FILE_PATHS:
+        print("Error: Invalid file key. Choose A, C, T, B.")
+    else:
+        file_path = FILE_PATHS[file_key]
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        pprint(data, indent=2)
+
+
+
+
+if args.view_web:
+    from file_manager import FileManager
+
+    import webbrowser
+    FILE_PATHS = {
+        "A": "files/accounts.json",
+        "C": "files/customers.json",
+        "T": "files/transactions.json",
+        "B": "files/BANK_MONEY.json",
+    }
+
+
+    file_key = args.view_web  # ← תוקן מ-args.deletion
+
+    if file_key not in FILE_PATHS:
+        print("Error: Invalid file key. Choose A, C, T, B, .")
+    else:
+        file_path = FILE_PATHS[file_key]
+        file = FileManager(file_path, {})
+
+        data = file.load_data()
+
+        rows = ""
+        for item in list(data.values())[0]:
+            rows += "<tr>" + "".join(f"<td>{v}</td>" for v in item.values()) + "</tr>"
+
+        headers = "".join(f"<th>{k}</th>" for k in list(data.values())[0][0].keys())
+
+        html = f"""
+        <html>
+        <body>
+        <table border="1">
+        <tr>{headers}</tr>
+        {rows}
+        </table>
+        </body>
+        </html>
+        """
+
+        with open("view.html", "w") as f:
+            f.write(html)
+
+        webbrowser.open("view.html")  # ← פותח בדפדפן אוטומטית
