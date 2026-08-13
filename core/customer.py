@@ -90,6 +90,23 @@ class CustomerUtils:
                     return  customer
         raise ValueError("account number or password not correct")
 
+    @staticmethod
+    def login_GUI(account_number,password):
+        import os
+        import sys
+        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from utils.file_manager import FileManager 
+        data = FileManager("files/customers.json", {"customers": []}).load_data()
+        for customer in data["customers"]:
+            if customer["account_number"] == str(account_number):
+                print("customers account is correct")
+                if str(customer["password"]) == str(password):
+                    print("customers password is correct")
+                    print("Login successful.")
+                    return  account_number,password
+        raise ValueError("account number or password not correct")
+
+
         
 
 
