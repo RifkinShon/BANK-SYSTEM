@@ -45,17 +45,17 @@ def Customer_create(id_number,name,age,email,phone,address,password):
         credit_score=CustomerUtils.credit_score(),
         created_time=CustomerUtils.created_time(),
     )
-    
-    dict_customer=customer.to_dict_customer()
 
-"""  
+    return customer.to_dict_customer()
+
+
 
 
  #----------
 #Account
 #---------   
-if  login_or_create:
-    loged_accounts_data=AccountUtils.search_accounts("356822024")
+def login_account(account_number):
+    loged_accounts_data=AccountUtils.search_accounts(account_number)
     checking_dict = loged_accounts_data["CHECKING"]
     checking_dict["account_type"] = "CHECKING"
 
@@ -81,13 +81,14 @@ if  login_or_create:
     checking = FileManager("files/accounts.json", {"accounts": [checking_dict_deletion]})
     saving = FileManager("files/accounts.json", {"accounts": [saving_dict_deletion]})
     loan = FileManager("files/accounts.json", {"accounts": [loan_dict_deletion]})
+    return checking_dict,saving_dict,loan_dict
     
 
 
 
 
     
-else:
+def create_account(dict_customer):
     common = {
             "account_number": dict_customer["account_number"],
             "ownerId": dict_customer["customer_id"],
@@ -118,7 +119,9 @@ else:
     checking_dict=checkingAccount.to_dict_account()
     saving_dict=savingsAccount.to_dict_account()
     loan_dict=loanAccount.to_dict_account()
-#מקשר בין המילוןים
+    return checking_dict,saving_dict,loan_dict
+
+"""#מקשר בין המילוןים
 accounts_link=[checking_dict,saving_dict,loan_dict]
 #-------------------------------
 #-------------------------------------
@@ -174,8 +177,7 @@ if transaction_type:
     transactionTO_dict=T1.to_dict_transaction_TO()
     transactionTO_dict["account_info"]["balance"] =TO_balance
     checking_dict_TO["transactions"].append(transactionTO_dict)
-
-    
+  
     #----------
     #FileManager
     #--------- 

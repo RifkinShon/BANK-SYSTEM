@@ -1,15 +1,16 @@
+from customtkinter import *
 from tkinter import messagebox
 
-from customtkinter import *
+
 from Main_GUI import *
 answers_list = []
-
+valid_account_number=None
+dict_customer =None
 def login_signup():
     selected_option = combo_box.get()
     frame.pack_forget()  # Hide frame 1
     answers_list.append(selected_option)
     login_or_create(selected_option)
-    
     if selected_option == "login":
         print("Login selected")
         frame2.pack(expand=True, fill=BOTH, padx=20, pady=20)  # Show frame 2
@@ -21,10 +22,13 @@ def login_info():
     try:
         rew_account_number = login_acc_entry.get()
         rew_password = login_pass_entry.get()
-
+        global valid_account_number
         valid_account_number, valid_password = CustomerUtils.login_GUI(rew_account_number, rew_password)
         Customer_login(valid_account_number, valid_password)
         messagebox.showinfo("Success", "Login successful")
+        frame2.pack_forget()
+        tabview_def(TRUE)
+
 
     except ValueError as e:
         messagebox.showerror("Input Error", str(e))
@@ -62,13 +66,17 @@ def sign_up_info():
         valid_password = CustomerUtils.password(raw_password)
 
         # 3. אם הגענו לכאן - כל הנתונים תקינים! שולחים ליצירת הלקוח
-        Customer_create(
+        global dict_customer
+        dict_customer = Customer_create(
             valid_id, valid_name, valid_age, 
             valid_email, valid_phone, valid_address, valid_password
         )
 
         # 4. הודעת הצלחה
         messagebox.showinfo("Success", "Account created successfully!")
+        frame3.pack_forget() 
+        tabview_def(FALSE)    
+
 
     except ValueError as e:
         # 5. ה-except תופס את ה-raise הראשון שנזרק מ-CustomerUtils!
@@ -77,8 +85,13 @@ def sign_up_info():
 
 
 
-
-
+def login_or_create_account(TRUE_or_FALSE):
+    if TRUE_or_FALSE:
+        checkingAccount,savingsAccount,loanAccount = login_account(valid_account_number)
+        return checkingAccount, savingsAccount, loanAccount
+    else:
+        checkingAccount,savingsAccount,loanAccount = create_account(dict_customer)
+        return checkingAccount, savingsAccount, loanAccount
 
 
 
@@ -90,7 +103,7 @@ def sign_up_info():
 
 
 app = CTk()
-app.geometry("500x550")  # Expanded height slightly to accommodate the sign-up inputs nicely
+app.geometry("800x550")  # Expanded height slightly to accommodate the sign-up inputs nicely
 set_appearance_mode("dark")
 
 # ========== Frame 1 ==========
@@ -208,6 +221,23 @@ btn_signup = CTkButton(
     command=sign_up_info 
 )
 btn_signup.place(relx=0.5, rely=0.88, anchor=CENTER)
+
+
+
+def tabview_def(TRUE_or_FALSE):
+
+
+    tabview = CTkTabview(master=app, width=400, height=300)
+    tabview.pack(expand=True, fill=BOTH, padx=20, pady=20)
+
+    checkingAccount, savingsAccount, loanAccount = login_or_create_account(TRUE_or_FALSE)
+    tabview.add("Tab 1")
+    label_tab1 = CTkLabel(master=tabview.tab("Tab 1"), text=f"welcome to your account {checkingAccount['account_holder']} ", font=("Arial", 24))
+    label_tab1.place(relx=0.5, rely=0.25, anchor=CENTER)
+
+    tabview.add("Tab 2")
+    tabview.add("Tab 3")
+
 
 
 app.mainloop()
