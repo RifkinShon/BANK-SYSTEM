@@ -121,21 +121,23 @@ def create_account(dict_customer):
     loan_dict=loanAccount.to_dict_account()
     return checking_dict,saving_dict,loan_dict
 
-"""#מקשר בין המילוןים
-accounts_link=[checking_dict,saving_dict,loan_dict]
-#-------------------------------
-#-------------------------------------
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#להוסיף בui שאם יש raise זה מחזיר חשבנות מחוקים
-common_transaction = {
-    "transactionId": FileManager.task_id("files/transactionId.txt"),
-    "amount": TransactionUtils.amount(69),
-    "timestamp": TransactionUtils.time_now_update(),
-    "account_info": checking_dict,
-    "fee": 7.5,
-    "status": TransactionUtils.transactionStatus("COMPLETED"),
-    "description": TransactionUtils.description("Initial deposit")
-}
+
+#מקשר בין המילוןים
+def accounts_for_transaction(checking_dict,saving_dict,loan_dict):
+    accounts_link=[checking_dict,saving_dict,loan_dict]
+    #-------------------------------
+    #-------------------------------------
+    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    #להוסיף בui שאם יש raise זה מחזיר חשבנות מחוקים
+    common_transaction = {
+        "transactionId": FileManager.task_id("files/transactionId.txt"),
+        "amount": TransactionUtils.amount(69),
+        "timestamp": TransactionUtils.time_now_update(),
+        "account_info": checking_dict,
+        "fee": 7.5,
+        "status": TransactionUtils.transactionStatus("COMPLETED"),
+        "description": TransactionUtils.description("Initial deposit")
+    }
 
 
 
@@ -144,14 +146,9 @@ common_transaction = {
 #---------   
 
 
-if transaction_type:
-        T1 = TransactionTo(
-        **common_transaction,
-        transactionType=TransactionUtils.transactionType("TRANSFER"),
-        account_number_To=TransactionUtils.account_number_To("356725531-L")
-    )
 
-else:
+
+def transaction(common_transaction,checkingAccount,checking_dict,dict_customer,saving_dict,loan_dict,checking,saving,loan):
     T1 = Transaction(
         **common_transaction,
         transactionType=TransactionUtils.transactionType("WITHDRAWAL")
@@ -159,8 +156,6 @@ else:
 
 
 
-
-if transaction_type:
     T1.cheack_status_transaction()
     transaction_dict = T1.to_dict_transaction()
 
@@ -224,16 +219,22 @@ if transaction_type:
 
 
 
-else:
+def transaction_TO(common_transaction,account_number_To,Account,checking_dict,dict_customer,saving_dict,loan_dict):
+    account_number_To=str(account_number_To)
+    T1 = TransactionTo(
+        **common_transaction,
+        transactionType=TransactionUtils.transactionType("TRANSFER"),
+        account_number_To=TransactionUtils.account_number_To(account_number_To)
+    )   
     T1.cheack_status_transaction()
     transaction_dict = T1.to_dict_transaction()
 
     print(f"Account Balance: {T1.account_info['balance']}")
-    checking_dict = checkingAccount.to_dict_account()
+    Account = Account.to_dict_account()
     balance_result = T1.change_balance()
-    checking_dict["balance"] = balance_result[0] 
-    T1.account_info = {k: v for k, v in checking_dict.items() if k != "transactions"}
-    checking_dict["transactions"].append(transaction_dict)
+    Account["balance"] = balance_result[0] 
+    T1.account_info = {k: v for k, v in Account.items() if k != "transactions"}
+    Account["transactions"].append(transaction_dict)
 
 
     #----------
@@ -264,6 +265,7 @@ else:
 
 
 #----------
-#FileManager
+#BANK_MONEY
 #--------- 
-BANK.BANK_MONEY(T1.fee,T1.transactionType)"""
+"""def BANK_MONEY(T1.fee,T1.transactionType):
+ BANK.BANK_MONEY(T1.fee,T1.transactionType)"""

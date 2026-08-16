@@ -232,12 +232,140 @@ def tabview_def(TRUE_or_FALSE):
 
     checkingAccount, savingsAccount, loanAccount = login_or_create_account(TRUE_or_FALSE)
     tabview.add("Tab 1")
-    label_tab1 = CTkLabel(master=tabview.tab("Tab 1"), text=f"welcome to your account {checkingAccount['account_holder']} ", font=("Arial", 24))
+    label_tab1 = CTkLabel(master=tabview.tab("Tab 1"), text=f"welcome to your account {checkingAccount['account_holder']} & {checkingAccount['account_number']}", font=("Arial", 24))
     label_tab1.place(relx=0.5, rely=0.25, anchor=CENTER)
+    label_tab1 = CTkLabel(master=tabview.tab("Tab 1"), text=f"Balance: ${checkingAccount['balance']:.2f}", font=("Arial", 24))
+    label_tab1.place(relx=0.5, rely=0.6, anchor=CENTER)
 
-    tabview.add("Tab 2")
-    tabview.add("Tab 3")
+
+    # 1. הוספת Tab 2
+    tab2 = tabview.add("Tab 2")
+
+    # 2. יצירת פריים נגלל בתוך Tab 2
+    scrollable_frame2 = CTkScrollableFrame(master=tabview.tab("Tab 2"))
+    scrollable_frame2.pack(fill=BOTH, expand=True, padx=10, pady=10)
+
+    # 3. כותרת בתוך הפריים הנגלל
+    label_tab2 = CTkLabel(master=scrollable_frame2, text="All Transactions", font=("Arial", 22, "bold"))
+    label_tab2.pack(pady=15)
+
+    # 4. הוספת תוכן רב כדי שיהיה אפשר לגלול למטה
+    for transaction in checkingAccount['transactions']:
+        trans_label = CTkLabel(
+            master=scrollable_frame2, 
+            text=f"{transaction['timestamp']}: {transaction['transactionType']} ${transaction['amount']:.2f} | Fee: ${transaction['fee']:.2f} | {transaction['status']}", 
+            font=("Arial", 14)
+        )
+        trans_label.pack(pady=8, anchor="w", padx=15)
+
+    tab3 = tabview.add("Tab 3")
+    scrollable_frame3 = CTkScrollableFrame(master=tabview.tab("Tab 3"))
+    scrollable_frame3.pack(fill=BOTH, expand=True, padx=10, pady=10)
+
+    # 3. כותרת בתוך הפריים הנגלל
+    label_tab3 = CTkLabel(master=scrollable_frame3, text="savings Account", font=("Arial", 22, "bold"))
+    label_tab3.pack(pady=15)
+
+
+    Money_Saving_entry = CTkEntry(master=scrollable_frame3, placeholder_text="Enter number to Withdraw or Deposit", width=200, height=30, corner_radius=5)
+    Money_Saving_entry.place(relx=0.7, rely=0.6, anchor=CENTER)
+
+
+
+    btn_signup = CTkButton(
+        master=scrollable_frame3, 
+        text="Withdraw from savings", 
+        corner_radius=10, 
+        fg_color="transparent", 
+        hover_color="green", 
+        text_color="white",
+        border_color="gray", 
+        border_width=2, 
+        font=("Arial", 16, "bold"),
+        command=None
+    )
+    btn_signup.place(relx=0.7, rely=0.88, anchor=CENTER)
+
+
+    btn_signup = CTkButton(
+        master=scrollable_frame3, 
+        text="Deposit to savings", 
+        corner_radius=10, 
+        fg_color="transparent", 
+        hover_color="green", 
+        text_color="white",
+        border_color="gray", 
+        border_width=2, 
+        font=("Arial", 16, "bold"),
+        command=None 
+    )
+    btn_signup.place(relx=0.3, rely=0.88, anchor=CENTER)
+
+
+        # 4. הוספת תוכן רב כדי שיהיה אפשר לגלול למטה
+    try:
+        for transaction in savingsAccount['transactions']:
+            trans_label = CTkLabel(
+                master=scrollable_frame3, 
+                text=f"{transaction['timestamp']}: {transaction['transactionType']} ${transaction['amount']:.2f} | Fee: ${transaction['fee']:.2f} | {transaction['status']}", 
+                font=("Arial", 14)
+            )
+            trans_label.pack(pady=10, anchor="w", padx=15)
+    except :
+        pass
+
+    tab4 = tabview.add("Tab 4")
+    scrollable_frame4 = CTkScrollableFrame(master=tabview.tab("Tab 4"))
+    scrollable_frame4.pack(fill=BOTH, expand=True, padx=10, pady=10)
+
+    # 3. כותרת בתוך הפריים הנגלל
+    label_tab4 = CTkLabel(master=scrollable_frame4, text="Loan Account", font=("Arial", 22, "bold"))
+    label_tab4.pack(pady=15)
+
+    Money_Loan_entry = CTkEntry(master=scrollable_frame4, placeholder_text="Enter number to Withdraw or Deposit", width=200, height=30, corner_radius=5)
+    Money_Loan_entry.place(relx=0.8, rely=0.110, anchor=CENTER)
+
+    btn_signup = CTkButton(
+        master=scrollable_frame4, 
+        text="Deposit to loan", 
+        corner_radius=10, 
+        fg_color="transparent", 
+        hover_color="green", 
+        text_color="white",
+        border_color="gray", 
+        border_width=2, 
+        font=("Arial", 16, "bold"),
+        command=None 
+    )
+    btn_signup.place(relx=0.8, rely=0.88, anchor=CENTER)
+
+
+        # 4. הוספת תוכן רב כדי שיהיה אפשר לגלול למטה
+    try:
+        for transaction in loanAccount['transactions']:
+            trans_label = CTkLabel(
+                master=scrollable_frame4, 
+                text=f"{transaction['timestamp']}: {transaction['transactionType']} ${transaction['amount']:.2f} | Fee: ${transaction['fee']:.2f} | {transaction['status']}", 
+                font=("Arial", 14)
+            )
+            trans_label.pack(pady=8, anchor="w", padx=15)
+    except :
+        pass
+   
+
+
+
+
+
+
+    tab5 = tabview.add("Tab 5")
+    label_tab1 = CTkLabel(master=tabview.tab("Tab 1"), text=f"TRANSACTIONS", font=("Arial", 24))
+    label_tab1.place(relx=0.5, rely=0.25, anchor=CENTER)
+    label_tab2= CTkLabel(master=tabview.tab("Tab 1"), text=f"WITHDRAWALS ,DEPOSITS,TRANSFERS", font=("Arial", 24))
+    label_tab2.place(relx=0.5, rely=0.25, anchor=CENTER)
+    
 
 
 
 app.mainloop()
+

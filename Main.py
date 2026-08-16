@@ -15,8 +15,8 @@ def transaction_type(SR):
     if SR == True or SR == False:
      return SR
 
-login_or_create=login_or_create(False)
-transaction_type=transaction_type(False)
+login_or_create=login_or_create(True)
+transaction_type=transaction_type(True)
 
 
 
@@ -25,7 +25,7 @@ transaction_type=transaction_type(False)
 #Customer
 #---------
 if login_or_create:
-    data=CustomerUtils.login("356822024",1235643223)
+    data=CustomerUtils.login("12",12)
     customer = Customer.from_dict(data) 
     dict_customer_login=customer.to_dict_customer()
     customer_login = FileManager("files/customers.json", {"customers": [dict_customer_login]})
@@ -58,7 +58,7 @@ dict_customer=customer.to_dict_customer()
 #Account
 #---------   
 if  login_or_create:
-    loged_accounts_data=AccountUtils.search_accounts("356822024")
+    loged_accounts_data=AccountUtils.search_accounts("12")
     checking_dict = loged_accounts_data["CHECKING"]
     checking_dict["account_type"] = "CHECKING"
 
@@ -148,7 +148,7 @@ if transaction_type:
         T1 = TransactionTo(
         **common_transaction,
         transactionType=TransactionUtils.transactionType("TRANSFER"),
-        account_number_To=TransactionUtils.account_number_To("356725531-L")
+        account_number_To=TransactionUtils.account_number_To("12-L")
     )
 
 else:

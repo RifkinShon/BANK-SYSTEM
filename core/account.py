@@ -196,7 +196,7 @@ class SavingsAccount(Account):
             balance=data["balance"],
             status=data["status"],
             daily_withdrawal_limit=data["daily_withdrawal_limit"],
-            transactions=data["transactions"],
+            transactions=data.get("transactions", []),
             credit_score=data["credit_score"],
             created_time=data["created_time"],
             updata_time=data["updata_time"]
