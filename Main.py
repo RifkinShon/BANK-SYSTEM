@@ -15,8 +15,8 @@ def transaction_type(SR):
     if SR == True or SR == False:
      return SR
 
-login_or_create=login_or_create(True)
-transaction_type=transaction_type(True)
+login_or_create=login_or_create(False)
+transaction_type=transaction_type(False)
 
 
 
@@ -148,7 +148,7 @@ if transaction_type:
         T1 = TransactionTo(
         **common_transaction,
         transactionType=TransactionUtils.transactionType("TRANSFER"),
-        account_number_To=TransactionUtils.account_number_To("12-L")
+        account_number_To=TransactionUtils.account_number_To("123456356-L")
     )
 
 else:

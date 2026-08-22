@@ -13,6 +13,7 @@ def login_signup():
     login_or_create(selected_option)
     if selected_option == "login":
         print("Login selected")
+
         frame2.pack(expand=True, fill=BOTH, padx=20, pady=20)  # Show frame 2
     elif selected_option == "sign up":
         print("Sign up selected")
@@ -24,10 +25,10 @@ def login_info():
         rew_password = login_pass_entry.get()
         global valid_account_number
         valid_account_number, valid_password = CustomerUtils.login_GUI(rew_account_number, rew_password)
-        Customer_login(valid_account_number, valid_password)
+        dict_customer_login = Customer_login(valid_account_number, valid_password)
         messagebox.showinfo("Success", "Login successful")
         frame2.pack_forget()
-        tabview_def(TRUE)
+        tabview_def(TRUE,dict_customer_login)
 
 
     except ValueError as e:
@@ -67,7 +68,7 @@ def sign_up_info():
 
         # 3. אם הגענו לכאן - כל הנתונים תקינים! שולחים ליצירת הלקוח
         global dict_customer
-        dict_customer = Customer_create(
+        dict_customer_sign_up=dict_customer = Customer_create(
             valid_id, valid_name, valid_age, 
             valid_email, valid_phone, valid_address, valid_password
         )
@@ -75,7 +76,7 @@ def sign_up_info():
         # 4. הודעת הצלחה
         messagebox.showinfo("Success", "Account created successfully!")
         frame3.pack_forget() 
-        tabview_def(FALSE)    
+        tabview_def(FALSE,dict_customer_sign_up)    
 
 
     except ValueError as e:
@@ -87,14 +88,31 @@ def sign_up_info():
 
 def login_or_create_account(TRUE_or_FALSE):
     if TRUE_or_FALSE:
-        checkingAccount,savingsAccount,loanAccount = login_account(valid_account_number)
-        return checkingAccount, savingsAccount, loanAccount
+        checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount = login_account(valid_account_number)
+        return checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount
     else:
-        checkingAccount,savingsAccount,loanAccount = create_account(dict_customer)
-        return checkingAccount, savingsAccount, loanAccount
+        checking_dict,saving_dict,loan_dict,checkingAccount,savingsAccount,loanAccount= create_account(dict_customer)
+        return checking_dict,saving_dict,loan_dict,checkingAccount,savingsAccount,loanAccount
 
 
 
+def DEPOSIT( dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount, amount):
+
+    
+    common_transaction = accounts_for_transaction(checking_dict, saving_dict, loan_dict, amount)
+    transaction(common_transaction, dict_customer, checking_dict, saving_dict, loan_dict, checking_File, saving_File, loan_File,checkingAccount,savingsAccount,loanAccount, "DEPOSIT")
+
+
+
+def WITHDRAWAL( dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount, amount):
+    common_transaction = accounts_for_transaction(checking_dict, saving_dict, loan_dict, amount)
+    transaction(common_transaction, dict_customer, checking_dict, saving_dict, loan_dict, checking_File, saving_File, loan_File,checkingAccount,savingsAccount,loanAccount, "WITHDRAWAL")
+
+
+
+
+def TRANSFER(checking_dict,saving_dict,loan_dict,dict_customer,checkingAccount,savingsAccount,loanAccount,amount):
+    accounts_for_transaction(checking_dict,saving_dict,loan_dict,amount)
 
 
 
@@ -224,17 +242,23 @@ btn_signup.place(relx=0.5, rely=0.88, anchor=CENTER)
 
 
 
-def tabview_def(TRUE_or_FALSE):
+def tabview_def(TRUE_or_FALSE,dict_customer):
+    dict_customer=dict_customer
 
 
+    
     tabview = CTkTabview(master=app, width=400, height=300)
     tabview.pack(expand=True, fill=BOTH, padx=20, pady=20)
-
-    checkingAccount, savingsAccount, loanAccount = login_or_create_account(TRUE_or_FALSE)
+    if TRUE_or_FALSE:
+        checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount = login_or_create_account(TRUE_or_FALSE)
+    else:
+        print(f"Account creation")
+        checking_dict,saving_dict,loan_dict,checkingAccount,savingsAccount,loanAccount = login_or_create_account(TRUE_or_FALSE)
+        checking_File,saving_File,loan_File=0,0,0
     tabview.add("Tab 1")
-    label_tab1 = CTkLabel(master=tabview.tab("Tab 1"), text=f"welcome to your account {checkingAccount['account_holder']} & {checkingAccount['account_number']}", font=("Arial", 24))
+    label_tab1 = CTkLabel(master=tabview.tab("Tab 1"), text=f"welcome to your account {checking_dict['account_holder']} & {checking_dict['account_number']}", font=("Arial", 24))
     label_tab1.place(relx=0.5, rely=0.25, anchor=CENTER)
-    label_tab1 = CTkLabel(master=tabview.tab("Tab 1"), text=f"Balance: ${checkingAccount['balance']:.2f}", font=("Arial", 24))
+    label_tab1 = CTkLabel(master=tabview.tab("Tab 1"), text=f"Balance: ${checking_dict['balance']:.2f}", font=("Arial", 24))
     label_tab1.place(relx=0.5, rely=0.6, anchor=CENTER)
 
 
@@ -250,30 +274,30 @@ def tabview_def(TRUE_or_FALSE):
     label_tab2.pack(pady=15)
 
     # 4. הוספת תוכן רב כדי שיהיה אפשר לגלול למטה
-    for transaction in checkingAccount['transactions']:
+    for transaction in checking_dict['transactions']:
         trans_label = CTkLabel(
             master=scrollable_frame2, 
             text=f"{transaction['timestamp']}: {transaction['transactionType']} ${transaction['amount']:.2f} | Fee: ${transaction['fee']:.2f} | {transaction['status']}", 
             font=("Arial", 14)
         )
         trans_label.pack(pady=8, anchor="w", padx=15)
-
     tab3 = tabview.add("Tab 3")
     scrollable_frame3 = CTkScrollableFrame(master=tabview.tab("Tab 3"))
     scrollable_frame3.pack(fill=BOTH, expand=True, padx=10, pady=10)
 
-    # 3. כותרת בתוך הפריים הנגלל
+    # כותרת בתוך הפריים הנגלל
     label_tab3 = CTkLabel(master=scrollable_frame3, text="savings Account", font=("Arial", 22, "bold"))
     label_tab3.pack(pady=15)
 
-
     Money_Saving_entry = CTkEntry(master=scrollable_frame3, placeholder_text="Enter number to Withdraw or Deposit", width=200, height=30, corner_radius=5)
-    Money_Saving_entry.place(relx=0.7, rely=0.6, anchor=CENTER)
+    Money_Saving_entry.pack(pady=20)
 
+    # Frame לכפתורים
+    btn_frame3 = CTkFrame(master=scrollable_frame3, fg_color="transparent")
+    btn_frame3.pack(pady=15)
 
-
-    btn_signup = CTkButton(
-        master=scrollable_frame3, 
+    btn_withdraw_savings = CTkButton(
+        master=btn_frame3, 
         text="Withdraw from savings", 
         corner_radius=10, 
         fg_color="transparent", 
@@ -284,11 +308,10 @@ def tabview_def(TRUE_or_FALSE):
         font=("Arial", 16, "bold"),
         command=None
     )
-    btn_signup.place(relx=0.7, rely=0.88, anchor=CENTER)
+    btn_withdraw_savings.pack(side="left", padx=10)
 
-
-    btn_signup = CTkButton(
-        master=scrollable_frame3, 
+    btn_deposit_savings = CTkButton(
+        master=btn_frame3, 
         text="Deposit to savings", 
         corner_radius=10, 
         fg_color="transparent", 
@@ -299,12 +322,11 @@ def tabview_def(TRUE_or_FALSE):
         font=("Arial", 16, "bold"),
         command=None 
     )
-    btn_signup.place(relx=0.3, rely=0.88, anchor=CENTER)
+    btn_deposit_savings.pack(side="left", padx=10)
 
-
-        # 4. הוספת תוכן רב כדי שיהיה אפשר לגלול למטה
+    # הוספת תוכן רב כדי שיהיה אפשר לגלול למטה
     try:
-        for transaction in savingsAccount['transactions']:
+        for transaction in saving_dict['transactions']:
             trans_label = CTkLabel(
                 master=scrollable_frame3, 
                 text=f"{transaction['timestamp']}: {transaction['transactionType']} ${transaction['amount']:.2f} | Fee: ${transaction['fee']:.2f} | {transaction['status']}", 
@@ -318,14 +340,14 @@ def tabview_def(TRUE_or_FALSE):
     scrollable_frame4 = CTkScrollableFrame(master=tabview.tab("Tab 4"))
     scrollable_frame4.pack(fill=BOTH, expand=True, padx=10, pady=10)
 
-    # 3. כותרת בתוך הפריים הנגלל
+    # כותרת בתוך הפריים הנגלל
     label_tab4 = CTkLabel(master=scrollable_frame4, text="Loan Account", font=("Arial", 22, "bold"))
     label_tab4.pack(pady=15)
 
     Money_Loan_entry = CTkEntry(master=scrollable_frame4, placeholder_text="Enter number to Withdraw or Deposit", width=200, height=30, corner_radius=5)
-    Money_Loan_entry.place(relx=0.8, rely=0.110, anchor=CENTER)
+    Money_Loan_entry.pack(pady=20)
 
-    btn_signup = CTkButton(
+    btn_deposit_loan = CTkButton(
         master=scrollable_frame4, 
         text="Deposit to loan", 
         corner_radius=10, 
@@ -337,12 +359,11 @@ def tabview_def(TRUE_or_FALSE):
         font=("Arial", 16, "bold"),
         command=None 
     )
-    btn_signup.place(relx=0.8, rely=0.88, anchor=CENTER)
+    btn_deposit_loan.pack(pady=15)
 
-
-        # 4. הוספת תוכן רב כדי שיהיה אפשר לגלול למטה
+    # הוספת תוכן רב כדי שיהיה אפשר לגלול למטה
     try:
-        for transaction in loanAccount['transactions']:
+        for transaction in loan_dict['transactions']:
             trans_label = CTkLabel(
                 master=scrollable_frame4, 
                 text=f"{transaction['timestamp']}: {transaction['transactionType']} ${transaction['amount']:.2f} | Fee: ${transaction['fee']:.2f} | {transaction['status']}", 
@@ -351,21 +372,79 @@ def tabview_def(TRUE_or_FALSE):
             trans_label.pack(pady=8, anchor="w", padx=15)
     except :
         pass
-   
-
-
-
-
-
-
     tab5 = tabview.add("Tab 5")
-    label_tab1 = CTkLabel(master=tabview.tab("Tab 1"), text=f"TRANSACTIONS", font=("Arial", 24))
-    label_tab1.place(relx=0.5, rely=0.25, anchor=CENTER)
-    label_tab2= CTkLabel(master=tabview.tab("Tab 1"), text=f"WITHDRAWALS ,DEPOSITS,TRANSFERS", font=("Arial", 24))
-    label_tab2.place(relx=0.5, rely=0.25, anchor=CENTER)
+
+    # כותרות בחלק העליון
+    label_tab1 = CTkLabel(master=tab5, text="TRANSACTIONS", font=("Arial", 24, "bold"))
+    label_tab1.place(relx=0.5, rely=0.08, anchor=CENTER)
+
+    label_tab2 = CTkLabel(master=tab5, text="WITHDRAWALS • DEPOSITS • TRANSFERS", font=("Arial", 14))
+    label_tab2.place(relx=0.5, rely=0.16, anchor=CENTER)
+
+    # ==================== שורה ראשונה: Entry Fields ===================
+    Withdraw_entry = CTkEntry(master=tab5, placeholder_text="Enter amount to Withdraw", width=200, height=35, corner_radius=5)
+    Withdraw_entry.place(relx=0.15, rely=0.32, anchor=CENTER)
+
+    Deposit_entry = CTkEntry(master=tab5, placeholder_text="Enter amount to Deposit", width=200, height=35, corner_radius=5)
+    Deposit_entry.place(relx=0.5, rely=0.32, anchor=CENTER)
+
+    Transfer_entry = CTkEntry(master=tab5, placeholder_text="Enter amount to Transfer", width=200, height=35, corner_radius=5)
+    Transfer_entry.place(relx=0.85, rely=0.32, anchor=CENTER)
+
+
+
+
+
+    # ==================== שורה שנייה: Buttons ===================
+    btn_Withdraw = CTkButton(
+        master=tab5, 
+        text="Withdraw", 
+        corner_radius=10, 
+        fg_color="transparent", 
+        hover_color="green", 
+        text_color="white",
+        border_color="gray", 
+        border_width=2, 
+        font=("Arial", 14, "bold"),
+        command=lambda: WITHDRAWAL( dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount, float(Withdraw_entry.get()))
+    )
+    btn_Withdraw.place(relx=0.15, rely=0.60, anchor=CENTER)
     
+    btn_Deposit = CTkButton(
+        master=tab5, 
+        text="Deposit", 
+        corner_radius=10, 
+        fg_color="transparent", 
+        hover_color="green", 
+        text_color="white",
+        border_color="gray", 
+        border_width=2, 
+        font=("Arial", 14, "bold"),
+            command=lambda: DEPOSIT(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount, float(Deposit_entry.get()))
+        )
+    btn_Deposit.place(relx=0.5, rely=0.60, anchor=CENTER)
+
+    btn_Transfer = CTkButton(
+        master=tab5, 
+        text="Transfer", 
+        corner_radius=10, 
+        fg_color="transparent", 
+        hover_color="green", 
+        text_color="white",
+        border_color="gray", 
+        border_width=2, 
+        font=("Arial", 14, "bold"),
+            command=lambda: TRANSFER(checking_dict, saving_dict, loan_dict,dict_customer, checkingAccount, savingsAccount, loanAccount, float(Transfer_entry.get()))
+        )
+    btn_Transfer.place(relx=0.85, rely=0.60, anchor=CENTER)
+
+
+
+  # ========== Frame 4 ==========
+def frame4():
+    frame = CTkFrame(master=app, width=400, height=300, corner_radius=10)
+    frame.pack(expand=True, fill=BOTH, padx=20, pady=20)
 
 
 
 app.mainloop()
-
