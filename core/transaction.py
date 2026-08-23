@@ -71,6 +71,9 @@ class Transaction:
             "account_info": account_info,
         }   
     def calculate_amount_in_account(self):
+        if self.transactionType == "DEPOSIT":
+            print("amount in account is not relevant for deposits.successful.")
+            return True
         if int(self.account_info["balance"]) >= self.amount+self.fee:
             print("Sufficient balance in the account.successful.")
             return True
@@ -127,7 +130,6 @@ class Transaction:
          self.account_info["balance"] -= self.amount + self.fee
     
        balance = self.account_info["balance"]  
-       print(balance)
        return balance,None
 # להוסיף שזה יוריד מהחשבון את הכסף      
 # צריך שזה שזה ימחוק מילון עם אותו נתונים עם קיים וירשום את המילון החדש  
@@ -135,7 +137,7 @@ class Transaction:
 
 
 
-print
+
 class TransactionTo(Transaction):
     def __init__(self, transactionId, amount, transactionType, timestamp, account_info, fee, status, description, account_number_To):
         super().__init__(transactionId, amount, transactionType, timestamp, account_info, fee, status, description)

@@ -19,6 +19,20 @@ def login_signup():
         print("Sign up selected")
         frame3.pack(expand=True, fill=BOTH, padx=20, pady=20)  # Show frame 3
 
+def Go_back(frame_num):
+    print("Go back")
+    if frame_num ==2:
+     frame2.pack_forget()
+     frame.pack(expand=True, fill=BOTH, padx=20, pady=20)
+
+    elif frame_num ==2:
+        frame3.pack_forget()
+        frame.pack(expand=True, fill=BOTH, padx=20, pady=20)
+    else:
+        frame4.pack_forget()
+
+
+
 def login_info():
     try:
         rew_account_number = login_acc_entry.get()
@@ -98,7 +112,7 @@ def login_or_create_account(TRUE_or_FALSE):
 
 def DEPOSIT( dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount, amount):
 
-    
+    print(f"amount DEEEE {amount}")
     common_transaction = accounts_for_transaction(checking_dict, saving_dict, loan_dict, amount)
     transaction(common_transaction, dict_customer, checking_dict, saving_dict, loan_dict, checking_File, saving_File, loan_File,checkingAccount,savingsAccount,loanAccount, "DEPOSIT")
 
@@ -110,9 +124,10 @@ def WITHDRAWAL( dict_customer,checking_dict,saving_dict,loan_dict,checking_File,
 
 
 
+def TRANSFER (dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount, amount,account_number_To):
+    common_transaction = accounts_for_transaction(checking_dict, saving_dict, loan_dict, amount)
+    transaction_TO(common_transaction, dict_customer, checking_dict, saving_dict, loan_dict, checking_File, saving_File, loan_File,checkingAccount,savingsAccount,loanAccount,account_number_To)
 
-def TRANSFER(checking_dict,saving_dict,loan_dict,dict_customer,checkingAccount,savingsAccount,loanAccount,amount):
-    accounts_for_transaction(checking_dict,saving_dict,loan_dict,amount)
 
 
 
@@ -190,6 +205,19 @@ btn = CTkButton(
 )
 btn.place(relx=0.5, rely=0.7, anchor=CENTER)
 
+btn = CTkButton(
+    master=frame2, 
+    text="Go back", 
+    corner_radius=10, 
+    fg_color="transparent", 
+    hover_color="green", 
+    text_color="white",
+    border_color="gray", 
+    border_width=2, 
+    font=("Arial", 16, "bold"), 
+    command= lambda : Go_back(2)
+)
+btn.place(relx=0.5, rely=0.8, anchor=CENTER)
 
 
 
@@ -238,7 +266,24 @@ btn_signup = CTkButton(
     font=("Arial", 16, "bold"),
     command=sign_up_info 
 )
-btn_signup.place(relx=0.5, rely=0.88, anchor=CENTER)
+btn_signup.place(relx=0.5, rely=0.8, anchor=CENTER)
+
+
+btn = CTkButton(
+    master=frame3, 
+    text="Go back", 
+    corner_radius=10, 
+    fg_color="transparent", 
+    hover_color="green", 
+    text_color="white",
+    border_color="gray", 
+    border_width=2, 
+    font=("Arial", 16, "bold"), 
+    command= lambda : Go_back(3)
+)
+btn.place(relx=0.5, rely=0.88, anchor=CENTER)
+
+
 
 
 
@@ -391,6 +436,9 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
     Transfer_entry = CTkEntry(master=tab5, placeholder_text="Enter amount to Transfer", width=200, height=35, corner_radius=5)
     Transfer_entry.place(relx=0.85, rely=0.32, anchor=CENTER)
 
+    Transfer_account_number_entry = CTkEntry(master=tab5, placeholder_text="Enter account number to Transfer", width=200, height=35, corner_radius=5)
+    Transfer_account_number_entry.place(relx=0.85, rely=0.42, anchor=CENTER)
+
 
 
 
@@ -434,7 +482,7 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
         border_color="gray", 
         border_width=2, 
         font=("Arial", 14, "bold"),
-            command=lambda: TRANSFER(checking_dict, saving_dict, loan_dict,dict_customer, checkingAccount, savingsAccount, loanAccount, float(Transfer_entry.get()))
+            command=lambda: TRANSFER(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount,float(Transfer_entry.get()),str(Transfer_account_number_entry.get))
         )
     btn_Transfer.place(relx=0.85, rely=0.60, anchor=CENTER)
 
@@ -444,7 +492,6 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
 def frame4():
     frame = CTkFrame(master=app, width=400, height=300, corner_radius=10)
     frame.pack(expand=True, fill=BOTH, padx=20, pady=20)
-
 
 
 app.mainloop()
