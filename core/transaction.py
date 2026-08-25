@@ -33,10 +33,10 @@ class TransactionUtils:
             return transaction_status
         raise ValueError("Invalid Transaction Status")
     @staticmethod
-    def account_number_To(account_number_To):
-        star_account_number_To=str(account_number_To)
+    def account_number_To(Account_number_To):
+        star_account_number_To=str(Account_number_To).strip()
         if  len(star_account_number_To) <= 11 and star_account_number_To[0:3]=="356":
-            return account_number_To
+            return star_account_number_To
         raise ValueError("num have to follow standard.")
  
 

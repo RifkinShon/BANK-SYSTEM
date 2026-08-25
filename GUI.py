@@ -129,8 +129,9 @@ def TRANSFER (dict_customer,checking_dict,saving_dict,loan_dict,checking_File,sa
     transaction_TO(common_transaction, dict_customer, checking_dict, saving_dict, loan_dict, checking_File, saving_File, loan_File,checkingAccount,savingsAccount,loanAccount,account_number_To)
 
 
-
-
+def LOAN_SAVING_DEPOSIT_WITHDRAWAL(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount, amount,account_number_To):
+    common_transaction = accounts_for_transaction(checking_dict, saving_dict, loan_dict, amount)
+    transaction_TO(common_transaction, dict_customer, checking_dict, saving_dict, loan_dict, checking_File, saving_File, loan_File,checkingAccount,savingsAccount,loanAccount,account_number_To)
 
 
 
@@ -301,7 +302,7 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
         checking_dict,saving_dict,loan_dict,checkingAccount,savingsAccount,loanAccount = login_or_create_account(TRUE_or_FALSE)
         checking_File,saving_File,loan_File=0,0,0
     tabview.add("Tab 1")
-    label_tab1 = CTkLabel(master=tabview.tab("Tab 1"), text=f"welcome to your account {checking_dict['account_holder']} & {checking_dict['account_number']}", font=("Arial", 24))
+    label_tab1 = CTkLabel(master=tabview.tab("Tab 1"), text=f"welcome to your account {checking_dict['account_holder']} & {dict_customer['account_number']}", font=("Arial", 24))
     label_tab1.place(relx=0.5, rely=0.25, anchor=CENTER)
     label_tab1 = CTkLabel(master=tabview.tab("Tab 1"), text=f"Balance: ${checking_dict['balance']:.2f}", font=("Arial", 24))
     label_tab1.place(relx=0.5, rely=0.6, anchor=CENTER)
@@ -326,6 +327,15 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
             font=("Arial", 14)
         )
         trans_label.pack(pady=8, anchor="w", padx=15)
+
+
+
+
+
+
+
+
+
     tab3 = tabview.add("Tab 3")
     scrollable_frame3 = CTkScrollableFrame(master=tabview.tab("Tab 3"))
     scrollable_frame3.pack(fill=BOTH, expand=True, padx=10, pady=10)
@@ -351,7 +361,7 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
         border_color="gray", 
         border_width=2, 
         font=("Arial", 16, "bold"),
-        command=None
+        command=lambda: LOAN_SAVING_DEPOSIT_WITHDRAWAL(dict_customer,saving_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, savingsAccount,savingsAccount,loanAccount,float(Money_Saving_entry.get()),checking_dict['account_number'])  
     )
     btn_withdraw_savings.pack(side="left", padx=10)
 
@@ -365,7 +375,7 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
         border_color="gray", 
         border_width=2, 
         font=("Arial", 16, "bold"),
-        command=None 
+        command=lambda: LOAN_SAVING_DEPOSIT_WITHDRAWAL(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount,float(Money_Saving_entry.get()),saving_dict['account_number'])  
     )
     btn_deposit_savings.pack(side="left", padx=10)
 
@@ -402,7 +412,7 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
         border_color="gray", 
         border_width=2, 
         font=("Arial", 16, "bold"),
-        command=None 
+        command=lambda: LOAN_SAVING_DEPOSIT_WITHDRAWAL(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount,float(Money_Loan_entry.get()),loan_dict['account_number']) 
     )
     btn_deposit_loan.pack(pady=15)
 
@@ -482,7 +492,7 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
         border_color="gray", 
         border_width=2, 
         font=("Arial", 14, "bold"),
-            command=lambda: TRANSFER(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount,float(Transfer_entry.get()),str(Transfer_account_number_entry.get))
+            command=lambda: TRANSFER(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount,float(Transfer_entry.get()),Transfer_account_number_entry.get())
         )
     btn_Transfer.place(relx=0.85, rely=0.60, anchor=CENTER)
 
