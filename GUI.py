@@ -24,12 +24,10 @@ def Go_back(frame_num):
     if frame_num ==2:
      frame2.pack_forget()
      frame.pack(expand=True, fill=BOTH, padx=20, pady=20)
-
-    elif frame_num ==2:
+    elif frame_num ==3:
         frame3.pack_forget()
         frame.pack(expand=True, fill=BOTH, padx=20, pady=20)
-    else:
-        frame4.pack_forget()
+
 
 
 
@@ -111,28 +109,45 @@ def login_or_create_account(TRUE_or_FALSE):
 
 
 def DEPOSIT( dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount, amount):
-
-    print(f"amount DEEEE {amount}")
+   try:
     common_transaction = accounts_for_transaction(checking_dict, saving_dict, loan_dict, amount)
     transaction(common_transaction, dict_customer, checking_dict, saving_dict, loan_dict, checking_File, saving_File, loan_File,checkingAccount,savingsAccount,loanAccount, "DEPOSIT")
-
+    messagebox.showinfo("Success", "deposit got send !")
+   except ValueError as e:
+        messagebox.showerror("Input Error", str(e))
+   
+    
 
 
 def WITHDRAWAL( dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount, amount):
-    common_transaction = accounts_for_transaction(checking_dict, saving_dict, loan_dict, amount)
-    transaction(common_transaction, dict_customer, checking_dict, saving_dict, loan_dict, checking_File, saving_File, loan_File,checkingAccount,savingsAccount,loanAccount, "WITHDRAWAL")
-
+    try:
+        common_transaction = accounts_for_transaction(checking_dict, saving_dict, loan_dict, amount)
+        transaction(common_transaction, dict_customer, checking_dict, saving_dict, loan_dict, checking_File, saving_File, loan_File,checkingAccount,savingsAccount,loanAccount, "WITHDRAWAL")
+        messagebox.showinfo("Success", "withdrawal got send !")
+    except ValueError as e:
+        messagebox.showerror("Input Error", str(e))
+   
 
 
 def TRANSFER (dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount, amount,account_number_To):
-    common_transaction = accounts_for_transaction(checking_dict, saving_dict, loan_dict, amount)
-    transaction_TO(common_transaction, dict_customer, checking_dict, saving_dict, loan_dict, checking_File, saving_File, loan_File,checkingAccount,savingsAccount,loanAccount,account_number_To)
-
+    try:
+        common_transaction = accounts_for_transaction(checking_dict, saving_dict, loan_dict, amount)
+        transaction_TO(common_transaction, dict_customer, checking_dict, saving_dict, loan_dict, checking_File, saving_File, loan_File,checkingAccount,savingsAccount,loanAccount,account_number_To)
+        messagebox.showinfo("Success", "transfer got send !")
+    except ValueError as e:
+        messagebox.showerror("Input Error", str(e))
+   
 
 def LOAN_SAVING_DEPOSIT_WITHDRAWAL(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount, amount,account_number_To):
-    common_transaction = accounts_for_transaction(checking_dict, saving_dict, loan_dict, amount)
-    transaction_TO(common_transaction, dict_customer, checking_dict, saving_dict, loan_dict, checking_File, saving_File, loan_File,checkingAccount,savingsAccount,loanAccount,account_number_To)
+    try:
+        common_transaction = accounts_for_transaction(checking_dict, saving_dict, loan_dict, amount)
+        transaction_TO(common_transaction, dict_customer, checking_dict, saving_dict, loan_dict, checking_File, saving_File, loan_File,checkingAccount,savingsAccount,loanAccount,account_number_To)
+        messagebox.showinfo("Success", "withdrawal/deposit got send !")
 
+    except ValueError as e:
+        messagebox.showerror("Input Error", str(e))
+   
+ 
 
 
 
@@ -304,8 +319,16 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
     tabview.add("Tab 1")
     label_tab1 = CTkLabel(master=tabview.tab("Tab 1"), text=f"welcome to your account {checking_dict['account_holder']} & {dict_customer['account_number']}", font=("Arial", 24))
     label_tab1.place(relx=0.5, rely=0.25, anchor=CENTER)
-    label_tab1 = CTkLabel(master=tabview.tab("Tab 1"), text=f"Balance: ${checking_dict['balance']:.2f}", font=("Arial", 24))
-    label_tab1.place(relx=0.5, rely=0.6, anchor=CENTER)
+
+    label_tab2 = CTkLabel(
+        master=tabview.tab("Tab 1"), 
+        text=f" Status: {checking_dict['status']} | Credit Score: {checking_dict['credit_score']} | Daily Limit: ${checking_dict.get('daily_withdrawal_limit', 0):.2f}", 
+        font=("Arial", 20)  # אפשר להקטין קצת ל-20 כדי שלא יחרוג מהמסך
+    )
+    label_tab2.place(relx=0.5, rely=0.4, anchor=CENTER)
+
+    label_tab3 = CTkLabel(master=tabview.tab("Tab 1"), text=f"Balance: ${checking_dict['balance']:.2f}", font=("Arial", 24))
+    label_tab3.place(relx=0.5, rely=0.6, anchor=CENTER)
 
 
     # 1. הוספת Tab 2
@@ -344,12 +367,20 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
     label_tab3 = CTkLabel(master=scrollable_frame3, text="savings Account", font=("Arial", 22, "bold"))
     label_tab3.pack(pady=15)
 
+    label_tab3_2 = CTkLabel(
+        master=scrollable_frame3, 
+        text=f"SAVING Balance: ${saving_dict['balance']} | Status: {saving_dict['status']}", 
+        font=("Arial", 20)
+    )
+    label_tab3_2.pack(pady=20)
+
+
     Money_Saving_entry = CTkEntry(master=scrollable_frame3, placeholder_text="Enter number to Withdraw or Deposit", width=200, height=30, corner_radius=5)
-    Money_Saving_entry.pack(pady=20)
+    Money_Saving_entry.pack(pady=25)
 
     # Frame לכפתורים
     btn_frame3 = CTkFrame(master=scrollable_frame3, fg_color="transparent")
-    btn_frame3.pack(pady=15)
+    btn_frame3.pack(pady=25)
 
     btn_withdraw_savings = CTkButton(
         master=btn_frame3, 
@@ -361,7 +392,7 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
         border_color="gray", 
         border_width=2, 
         font=("Arial", 16, "bold"),
-        command=lambda: LOAN_SAVING_DEPOSIT_WITHDRAWAL(dict_customer,saving_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, savingsAccount,savingsAccount,loanAccount,float(Money_Saving_entry.get()),checking_dict['account_number'])  
+        command=lambda: LOAN_SAVING_DEPOSIT_WITHDRAWAL(dict_customer,saving_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, savingsAccount,savingsAccount,loanAccount,Money_Saving_entry.get(),checking_dict['account_number'])  
     )
     btn_withdraw_savings.pack(side="left", padx=10)
 
@@ -375,7 +406,7 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
         border_color="gray", 
         border_width=2, 
         font=("Arial", 16, "bold"),
-        command=lambda: LOAN_SAVING_DEPOSIT_WITHDRAWAL(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount,float(Money_Saving_entry.get()),saving_dict['account_number'])  
+        command=lambda: LOAN_SAVING_DEPOSIT_WITHDRAWAL(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount,Money_Saving_entry.get(),saving_dict['account_number'])  
     )
     btn_deposit_savings.pack(side="left", padx=10)
 
@@ -391,6 +422,8 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
     except :
         pass
 
+
+
     tab4 = tabview.add("Tab 4")
     scrollable_frame4 = CTkScrollableFrame(master=tabview.tab("Tab 4"))
     scrollable_frame4.pack(fill=BOTH, expand=True, padx=10, pady=10)
@@ -398,6 +431,15 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
     # כותרת בתוך הפריים הנגלל
     label_tab4 = CTkLabel(master=scrollable_frame4, text="Loan Account", font=("Arial", 22, "bold"))
     label_tab4.pack(pady=15)
+
+
+    label_tab4_2 = CTkLabel(
+        master=scrollable_frame4, 
+        text=f"LOAN Balance: ${saving_dict['balance']} | Status: {saving_dict['status']}", 
+        font=("Arial", 20)
+    )
+    label_tab4_2.pack(pady=20)
+
 
     Money_Loan_entry = CTkEntry(master=scrollable_frame4, placeholder_text="Enter number to Withdraw or Deposit", width=200, height=30, corner_radius=5)
     Money_Loan_entry.pack(pady=20)
@@ -412,7 +454,7 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
         border_color="gray", 
         border_width=2, 
         font=("Arial", 16, "bold"),
-        command=lambda: LOAN_SAVING_DEPOSIT_WITHDRAWAL(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount,float(Money_Loan_entry.get()),loan_dict['account_number']) 
+        command=lambda: LOAN_SAVING_DEPOSIT_WITHDRAWAL(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount,Money_Loan_entry.get(),loan_dict['account_number']) 
     )
     btn_deposit_loan.pack(pady=15)
 
@@ -464,7 +506,7 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
         border_color="gray", 
         border_width=2, 
         font=("Arial", 14, "bold"),
-        command=lambda: WITHDRAWAL( dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount, float(Withdraw_entry.get()))
+        command=lambda: WITHDRAWAL( dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount,Withdraw_entry.get())
     )
     btn_Withdraw.place(relx=0.15, rely=0.60, anchor=CENTER)
     
@@ -478,7 +520,7 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
         border_color="gray", 
         border_width=2, 
         font=("Arial", 14, "bold"),
-            command=lambda: DEPOSIT(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount, float(Deposit_entry.get()))
+            command=lambda: DEPOSIT(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount,Deposit_entry.get())
         )
     btn_Deposit.place(relx=0.5, rely=0.60, anchor=CENTER)
 
@@ -492,7 +534,7 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
         border_color="gray", 
         border_width=2, 
         font=("Arial", 14, "bold"),
-            command=lambda: TRANSFER(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount,float(Transfer_entry.get()),Transfer_account_number_entry.get())
+            command=lambda: TRANSFER(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount,Transfer_entry.get(),Transfer_account_number_entry.get())
         )
     btn_Transfer.place(relx=0.85, rely=0.60, anchor=CENTER)
 
