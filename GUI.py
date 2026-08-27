@@ -1,7 +1,5 @@
 from customtkinter import *
 from tkinter import messagebox
-
-
 from Main_GUI import *
 answers_list = []
 valid_account_number=None
@@ -48,9 +46,6 @@ def login_info():
    
     
 
-from tkinter import messagebox
-from core.customer import CustomerUtils  # ייבוא המחלקה שיצרת
-from Main_GUI import Customer_create      # או איפה שפונקציית היצירה יושבת
 
 def sign_up_info():
     try:
@@ -100,12 +95,11 @@ def sign_up_info():
 
 def login_or_create_account(TRUE_or_FALSE):
     if TRUE_or_FALSE:
-        checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount = login_account(valid_account_number)
-        return checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount
+        checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File,checkingAccount,savingsAccount,loanAccount = login_account(valid_account_number)
+        return checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File,checkingAccount,savingsAccount,loanAccount
     else:
-        checking_dict,saving_dict,loan_dict,checkingAccount,savingsAccount,loanAccount= create_account(dict_customer)
-        return checking_dict,saving_dict,loan_dict,checkingAccount,savingsAccount,loanAccount
-
+        checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File,checkingAccount,savingsAccount,loanAccount = create_account(dict_customer)
+        return checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File,checkingAccount,savingsAccount,loanAccount
 
 
 def DEPOSIT( dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount, amount):
@@ -310,12 +304,14 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
     
     tabview = CTkTabview(master=app, width=400, height=300)
     tabview.pack(expand=True, fill=BOTH, padx=20, pady=20)
-    if TRUE_or_FALSE:
-        checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount = login_or_create_account(TRUE_or_FALSE)
+    if (TRUE_or_FALSE):
+        checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File,checkingAccount,savingsAccount,loanAccount = login_or_create_account(TRUE_or_FALSE)
+    elif(TRUE_or_FALSE==FALSE):
+        checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File,checkingAccount,savingsAccount,loanAccount = login_or_create_account(TRUE_or_FALSE)
+
+
     else:
-        print(f"Account creation")
-        checking_dict,saving_dict,loan_dict,checkingAccount,savingsAccount,loanAccount = login_or_create_account(TRUE_or_FALSE)
-        checking_File,saving_File,loan_File=0,0,0
+        raise("tabview_def raise ")
     tabview.add("Tab 1")
     label_tab1 = CTkLabel(master=tabview.tab("Tab 1"), text=f"welcome to your account {checking_dict['account_holder']} & {dict_customer['account_number']}", font=("Arial", 24))
     label_tab1.place(relx=0.5, rely=0.25, anchor=CENTER)
@@ -435,7 +431,7 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
 
     label_tab4_2 = CTkLabel(
         master=scrollable_frame4, 
-        text=f"LOAN Balance: ${saving_dict['balance']} | Status: {saving_dict['status']}", 
+        text=f"LOAN Balance: ${loan_dict['balance']} | Status: {loan_dict['status']}", 
         font=("Arial", 20)
     )
     label_tab4_2.pack(pady=20)

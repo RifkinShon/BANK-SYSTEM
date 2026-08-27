@@ -40,7 +40,7 @@ def Customer_login(account_number,password):
     customer_login = FileManager("files/customers.json", {"customers": [dict_customer_login]})
     return dict_customer_login
 
-"""    customer_login.delete_data()"""
+
 
 
 
@@ -95,7 +95,7 @@ def login_account(account_number):
     checking_File = FileManager("files/accounts.json", {"accounts": [checking_dict_deletion]})
     saving_File = FileManager("files/accounts.json", {"accounts": [saving_dict_deletion]})
     loan_File = FileManager("files/accounts.json", {"accounts": [loan_dict_deletion]})
-    return checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount
+    return checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File,checkingAccount,savingsAccount,loanAccount
     
 
 
@@ -133,7 +133,35 @@ def create_account(dict_customer):
     checking_dict=checkingAccount.to_dict_account()
     saving_dict=savingsAccount.to_dict_account()
     loan_dict=loanAccount.to_dict_account()
-    return checking_dict,saving_dict,loan_dict,checkingAccount,savingsAccount,loanAccount
+
+
+
+
+    customer = FileManager("files/customers.json", {"customers": [dict_customer]})
+
+    checking_File = FileManager("files/accounts.json", {"accounts": [checking_dict]})
+    saving_File = FileManager("files/accounts.json", {"accounts": [saving_dict]})
+    loan_File = FileManager("files/accounts.json", {"accounts": [loan_dict]})
+
+
+    files_list = [customer,checking_File ,saving_File,loan_File]
+    
+
+
+  
+    for file in files_list:
+     file.ensure_file_exists()  
+
+    customer.save_data()
+    checking_File.save_data()
+    saving_File.save_data()
+    loan_File.save_data()
+
+
+
+
+
+    return checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File,checkingAccount,savingsAccount,loanAccount
 
 
 #מקשר בין המילוןים
@@ -182,7 +210,6 @@ def transaction(common_transaction, dict_customer, checking_dict, saving_dict, l
     TO_balance=balance_result[1]
     print(f"{TO_balance}TO_balance")
 
-  
     #----------
     #FileManager
     #--------- 
@@ -191,7 +218,7 @@ def transaction(common_transaction, dict_customer, checking_dict, saving_dict, l
         saving_File.delete_data()
         loan_File.delete_data()
     except:
-        pass
+        raise ValueError("delete_data problem")
 
 
     customer = FileManager("files/customers.json", {"customers": [dict_customer]})
@@ -210,7 +237,7 @@ def transaction(common_transaction, dict_customer, checking_dict, saving_dict, l
     for file in files_list:
      file.ensure_file_exists()  
 
-    customer.save_data()
+    """account_checking.save_data()"""    
     account_checking.save_data()
     account_saving.save_data()
     account_loan.save_data()
@@ -266,10 +293,12 @@ def transaction_TO(common_transaction, dict_customer, checking_dict, saving_dict
     #----------
     #FileManager
     #--------- 
-    if  login_or_create:
+    try :
         checking_File.delete_data()
         saving_File.delete_data()
         loan_File.delete_data()
+    except:
+        raise ValueError("delete_data problem")
 
 
     customer = FileManager("files/customers.json", {"customers": [dict_customer]})
@@ -290,8 +319,7 @@ def transaction_TO(common_transaction, dict_customer, checking_dict, saving_dict
     for file in files_list:
      file.ensure_file_exists()  
 
-    customer.save_data()
-    account_checking.save_data()
+    """account_checking.save_data()"""    
     if saving_dict["account_number"] != checking_dict_TO["account_number"]:
         account_saving.save_data()
     if loan_dict["account_number"] != checking_dict_TO["account_number"]:

@@ -2,7 +2,7 @@
   "customers": [
     {
       "customer_id": "123456789",
-      "account_number": "356102889",
+      "account_number": "35665153",
       "password": 12,
       "name": "John Doe",
       "age": 30,
@@ -10,21 +10,21 @@
       "phone": "0501234567",
       "address": "123 Main St, City, Country",
       "role": "CLIENT",
-      "credit_score": 778,
-      "created_time": "2026-08-25 "
+      "credit_score": 507,
+      "created_time": "2026-08-28 "
     },
     {
-      "customer_id": "218303154",
-      "account_number": "35656984",
-      "password": "1257",
-      "name": "Shon Rifkin",
-      "age": 17,
-      "email": "sr.1257.356@gmail.com",
-      "phone": "0544587737",
-      "address": "pychia",
+      "customer_id": "123456789",
+      "account_number": "356523601",
+      "password": "11",
+      "name": "QQ",
+      "age": 33,
+      "email": "E@gmail.com",
+      "phone": "0512345678",
+      "address": "ww",
       "role": "CLIENT",
-      "credit_score": 846,
-      "created_time": "2026-08-25 "
+      "credit_score": 369,
+      "created_time": "2026-08-28 "
     }
   ]
 }

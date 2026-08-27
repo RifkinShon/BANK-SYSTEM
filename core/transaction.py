@@ -9,6 +9,14 @@ class TransactionUtils:
         return now.strftime("%Y-%m-%d %H:%M")
     @staticmethod
     def amount(amount):
+        try:
+            # נסה להמיר למספר שלם
+                amount = int(amount)
+        except ValueError:
+            try:
+                amount = float(amount)
+            except ValueError:
+                pass
         if not isinstance(amount, (int, float)):
             raise ValueError("Amount must be a number.")
         if amount < 0 :
