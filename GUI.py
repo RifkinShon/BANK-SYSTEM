@@ -38,7 +38,7 @@ def login_info():
         dict_customer_login = Customer_login(valid_account_number, valid_password)
         messagebox.showinfo("Success", "Login successful")
         frame2.pack_forget()
-        tabview_def(TRUE,dict_customer_login)
+        tabview_def(TRUE,dict_customer_login,FALSE)
 
 
     except ValueError as e:
@@ -83,7 +83,7 @@ def sign_up_info():
         # 4. הודעת הצלחה
         messagebox.showinfo("Success", "Account created successfully!")
         frame3.pack_forget() 
-        tabview_def(FALSE,dict_customer_sign_up)    
+        tabview_def(FALSE,dict_customer_sign_up,FALSE)    
 
 
     except ValueError as e:
@@ -104,9 +104,10 @@ def login_or_create_account(TRUE_or_FALSE):
 
 def DEPOSIT( dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount, amount):
    try:
-    common_transaction = accounts_for_transaction(checking_dict, saving_dict, loan_dict, amount)
-    transaction(common_transaction, dict_customer, checking_dict, saving_dict, loan_dict, checking_File, saving_File, loan_File,checkingAccount,savingsAccount,loanAccount, "DEPOSIT")
+    common_transaction = accounts_for_transaction(checking_dict, saving_dict, loan_dict, amount,"DEPOSIT")
+    transaction(common_transaction, dict_customer, checking_dict, saving_dict, loan_dict, checking_File, saving_File, loan_File,checkingAccount,savingsAccount,loanAccount,"DEPOSIT")
     messagebox.showinfo("Success", "deposit got send !")
+    tabview_def(True,dict_customer,True)
    except ValueError as e:
         messagebox.showerror("Input Error", str(e))
    
@@ -115,9 +116,10 @@ def DEPOSIT( dict_customer,checking_dict,saving_dict,loan_dict,checking_File,sav
 
 def WITHDRAWAL( dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount, amount):
     try:
-        common_transaction = accounts_for_transaction(checking_dict, saving_dict, loan_dict, amount)
-        transaction(common_transaction, dict_customer, checking_dict, saving_dict, loan_dict, checking_File, saving_File, loan_File,checkingAccount,savingsAccount,loanAccount, "WITHDRAWAL")
+        common_transaction = accounts_for_transaction(checking_dict, saving_dict, loan_dict, amount,"WITHDRAWAL")
+        transaction(common_transaction, dict_customer, checking_dict, saving_dict, loan_dict, checking_File, saving_File, loan_File,checkingAccount,savingsAccount,loanAccount,"WITHDRAWAL")
         messagebox.showinfo("Success", "withdrawal got send !")
+        tabview_def(True,dict_customer,True)
     except ValueError as e:
         messagebox.showerror("Input Error", str(e))
    
@@ -125,24 +127,24 @@ def WITHDRAWAL( dict_customer,checking_dict,saving_dict,loan_dict,checking_File,
 
 def TRANSFER (dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount, amount,account_number_To):
     try:
-        common_transaction = accounts_for_transaction(checking_dict, saving_dict, loan_dict, amount)
+        common_transaction = accounts_for_transaction(checking_dict, saving_dict, loan_dict, amount,"Transfer")
         transaction_TO(common_transaction, dict_customer, checking_dict, saving_dict, loan_dict, checking_File, saving_File, loan_File,checkingAccount,savingsAccount,loanAccount,account_number_To)
         messagebox.showinfo("Success", "transfer got send !")
+        tabview_def(True,dict_customer,True)   
     except ValueError as e:
         messagebox.showerror("Input Error", str(e))
    
 
-def LOAN_SAVING_DEPOSIT_WITHDRAWAL(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount, amount,account_number_To):
+def LOAN_SAVING_DEPOSIT_WITHDRAWAL(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount, amount,account_number_To,transactionType):
     try:
-        common_transaction = accounts_for_transaction(checking_dict, saving_dict, loan_dict, amount)
+        common_transaction = accounts_for_transaction(checking_dict, saving_dict, loan_dict, amount,transactionType)
         transaction_TO(common_transaction, dict_customer, checking_dict, saving_dict, loan_dict, checking_File, saving_File, loan_File,checkingAccount,savingsAccount,loanAccount,account_number_To)
         messagebox.showinfo("Success", "withdrawal/deposit got send !")
-
+        tabview_def(True,dict_customer,True)
     except ValueError as e:
         messagebox.showerror("Input Error", str(e))
    
  
-
 
 
 app = CTk()
@@ -297,13 +299,18 @@ btn.place(relx=0.5, rely=0.88, anchor=CENTER)
 
 
 
-def tabview_def(TRUE_or_FALSE,dict_customer):
-    dict_customer=dict_customer
-
-
+# נניח ש-tabview מוגדר כמשתנה גלובלי או ששומרים אותו נכון
+def tabview_def(TRUE_or_FALSE, dict_customer, refreash):
+    global tabview # אם הוא משתנה גלובלי
     
+    if refreash:
+        try:
+            tabview.destroy() # מוחק את הישן מהזיכרון
+        except NameError:
+            pass # אם הוא עוד לא היה קיים מעולם, לא עושים כלום
+
     tabview = CTkTabview(master=app, width=400, height=300)
-    tabview.pack(expand=True, fill=BOTH, padx=20, pady=20)
+    tabview.pack(expand=True, fill="both", padx=20, pady=20)
     if (TRUE_or_FALSE):
         checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File,checkingAccount,savingsAccount,loanAccount = login_or_create_account(TRUE_or_FALSE)
     elif(TRUE_or_FALSE==FALSE):
@@ -388,8 +395,9 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
         border_color="gray", 
         border_width=2, 
         font=("Arial", 16, "bold"),
-        command=lambda: LOAN_SAVING_DEPOSIT_WITHDRAWAL(dict_customer,saving_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, savingsAccount,savingsAccount,loanAccount,Money_Saving_entry.get(),checking_dict['account_number'])  
+        command=lambda: LOAN_SAVING_DEPOSIT_WITHDRAWAL(dict_customer,saving_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount,Money_Saving_entry.get(),checking_dict['account_number'],"WITHDRAWAL")  
     )
+
     btn_withdraw_savings.pack(side="left", padx=10)
 
     btn_deposit_savings = CTkButton(
@@ -402,7 +410,7 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
         border_color="gray", 
         border_width=2, 
         font=("Arial", 16, "bold"),
-        command=lambda: LOAN_SAVING_DEPOSIT_WITHDRAWAL(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount,Money_Saving_entry.get(),saving_dict['account_number'])  
+        command=lambda: LOAN_SAVING_DEPOSIT_WITHDRAWAL(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount,Money_Saving_entry.get(),saving_dict['account_number'],"DEPOSIT")  
     )
     btn_deposit_savings.pack(side="left", padx=10)
 
@@ -450,7 +458,7 @@ def tabview_def(TRUE_or_FALSE,dict_customer):
         border_color="gray", 
         border_width=2, 
         font=("Arial", 16, "bold"),
-        command=lambda: LOAN_SAVING_DEPOSIT_WITHDRAWAL(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount,Money_Loan_entry.get(),loan_dict['account_number']) 
+        command=lambda: LOAN_SAVING_DEPOSIT_WITHDRAWAL(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount,Money_Loan_entry.get(),loan_dict['account_number'],"DEPOSIT") 
     )
     btn_deposit_loan.pack(pady=15)
 

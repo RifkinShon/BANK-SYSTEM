@@ -218,6 +218,12 @@ class TransactionTo(Transaction):
             else:
                 return  self.account_info["balance"],to_find_account_To[1]["balance"]
 
+    
+    def cheack_account_status(self):
+        accountTO=self.to_dict_account_transaction_TO()
+        if (accountTO["account_type"] =="LOAN" or accountTO["account_type"] =="SAVINGS")  and accountTO["status"] =="CLOSED":
+                return False
+        return True
 
 # להוסיף שזה יוריד מהחשבון את הכסף        
 
@@ -225,8 +231,9 @@ class TransactionTo(Transaction):
         super().cheack_status_transaction()
         search_account_info_To=self.search_account_info_To()
         not_same_account=self.not_same_account()
+        cheack_account_status=self.cheack_account_status()
         if self.status=="COMPLETED":
-         if search_account_info_To[0] and not_same_account:
+         if search_account_info_To[0] and not_same_account and cheack_account_status:
             print("status is COMPLETED")
             return
         self.status = "FAILED"

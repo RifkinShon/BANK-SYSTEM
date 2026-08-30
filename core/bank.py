@@ -69,9 +69,12 @@ class BANK:
         now = datetime.now()
 
         for account in data["accounts"]:
-
+            
             if account.get("account_type", "").upper() != "LOAN":
                 continue
+
+            if account["balance"] >= 0:
+                account["status"] = "CLOSED"
 
             if account.get("status", "").upper() == "CLOSED":
                 print(f"Account {account['account_number']} is closed - skipping")
@@ -129,7 +132,7 @@ class BANK:
                     continue
 
                 if account.get("status", "").upper() == "CLOSED":
-                    print(f"Account {account['account_number']} is closed - skipping  - balance {new_balance} ")
+                    print(f"Account {account['account_number']} is closed - skipping  - balance {account["balance"]} ")
 
                     continue
 
