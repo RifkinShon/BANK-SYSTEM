@@ -366,6 +366,17 @@ def tabview_def(TRUE_or_FALSE, dict_customer, refreash):
     scrollable_frame3 = CTkScrollableFrame(master=tabview.tab("Tab 3"))
     scrollable_frame3.pack(fill=BOTH, expand=True, padx=10, pady=10)
 
+    def handle_close_saving():
+     try:
+        from utils.file_manager import FileManager
+        account_number = saving_dict['account_number']
+        edit_dict = FileManager("files/accounts.json", {"edit": [{"account_number": account_number, "attribute": "status", "value": "CLOSED"}]})
+        edit_dict.edit_data()
+        messagebox.showinfo("Success", "SAVING CLOSED")
+        tabview_def(True,dict_customer,True)
+     except ValueError as e:
+        messagebox.showerror("Input Error", str(e))
+
     # כותרת בתוך הפריים הנגלל
     label_tab3 = CTkLabel(master=scrollable_frame3, text="savings Account", font=("Arial", 22, "bold"))
     label_tab3.pack(pady=15)
@@ -413,6 +424,23 @@ def tabview_def(TRUE_or_FALSE, dict_customer, refreash):
         command=lambda: LOAN_SAVING_DEPOSIT_WITHDRAWAL(dict_customer,checking_dict,saving_dict,loan_dict,checking_File,saving_File,loan_File, checkingAccount,savingsAccount,loanAccount,Money_Saving_entry.get(),saving_dict['account_number'],"DEPOSIT")  
     )
     btn_deposit_savings.pack(side="left", padx=10)
+
+
+
+    btn_CLOSED = CTkButton(
+        master=btn_frame3, 
+        text="Close Savings Account", 
+        corner_radius=10, 
+        fg_color="transparent", 
+        hover_color="red", 
+        text_color="white",
+        border_color="red", 
+        border_width=2, 
+        font=("Arial", 16, "bold"),
+        command=lambda: handle_close_saving()
+    )
+    btn_CLOSED.pack(side="left", padx=10)
+
 
     # הוספת תוכן רב כדי שיהיה אפשר לגלול למטה
     try:
