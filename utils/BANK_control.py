@@ -1,8 +1,9 @@
 import argparse
 from argparse import Namespace
-
 # Command system for editing JSON and CSV files
 print("# Command system for BANK system")
+"""python utils/BANK_control.py """
+""" השורה למעלה חייבת לכלול כדי שהקוד יתפקד כראוי, אחרת הוא לא יזהה את הפרמטרים שנשלחים מהטרמינל."""
 parser = argparse.ArgumentParser(
     description="Command system for editing JSON and CSV files"
 )
@@ -43,7 +44,7 @@ parser.add_argument(
 
 parser.add_argument(
     "-a","--activate",
-    help="Close an account based on its number"
+    help="Activate an account based on its number"  # תוקן: היה "Close" (העתק-הדבק שגוי)
 )
 parser.add_argument(
     "-v","--view",
@@ -89,8 +90,7 @@ if args.deletion_file:
         "T_ID": "files/transactionId.txt"
     }
 
-
-    file_key = args.deletion_file  # ← תוקן מ-args.deletion
+    file_key = args.deletion_file
 
     if file_key not in FILE_PATHS:
         print("Error: Invalid file key. Choose A, C, T, B, or T_ID.")
@@ -98,7 +98,6 @@ if args.deletion_file:
         file_path = FILE_PATHS[file_key]
         deletion_dict = FileManager(file_path, {})
         deletion_dict.delete_file()
-
 
 
 if args.edit:
@@ -148,71 +147,109 @@ if args.activate:
     edit_dict.edit_data()
 
 
-
 if args.view:
     from pprint import pprint
     import json
 
+    # תוקן: נוסף T_ID כדי להתאים ל-choices של הפרסר
     FILE_PATHS = {
         "A": "files/accounts.json",
         "C": "files/customers.json",
         "T": "files/transactions.json",
         "B": "files/BANK_MONEY.json",
+        "T_ID": "files/transactionId.txt",
     }
 
     file_key = args.view
 
     if file_key not in FILE_PATHS:
-        print("Error: Invalid file key. Choose A, C, T, B.")
+        print("Error: Invalid file key. Choose A, C, T, B, or T_ID.")
     else:
         file_path = FILE_PATHS[file_key]
-        with open(file_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        pprint(data, indent=2)
-
-
+        # תוקן: הוספת טיפול בשגיאות (קובץ לא קיים / לא JSON תקין / ריק)
+        try:
+            if file_key == "T_ID":
+                # transactionId.txt הוא קובץ טקסט רגיל, לא JSON
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    print(f.read())
+            else:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                if not content.strip():
+                    print(f"File '{file_path}' is empty.")
+                else:
+                    data = json.loads(content)
+                    pprint(data, indent=2)
+        except FileNotFoundError:
+            print(f"Error: File '{file_path}' not found.")
+        except json.JSONDecodeError:
+            print(f"Error: File '{file_path}' is not a valid JSON file.")
 
 
 if args.view_web:
     from file_manager import FileManager
-
     import webbrowser
+    import html as html_lib
+    import os
+
     FILE_PATHS = {
         "A": "files/accounts.json",
         "C": "files/customers.json",
         "T": "files/transactions.json",
         "B": "files/BANK_MONEY.json",
+        "T_ID": "files/transactionId.txt",
     }
 
-
-    file_key = args.view_web  # ← תוקן מ-args.deletion
+    file_key = args.view_web
 
     if file_key not in FILE_PATHS:
-        print("Error: Invalid file key. Choose A, C, T, B, .")
+        print("Error: Invalid file key. Choose A, C, T, B, or T_ID.")
+    elif file_key == "T_ID":
+        print("Error: T_ID is a plain text file and cannot be viewed as HTML table. Use -v T_ID instead.")
     else:
         file_path = FILE_PATHS[file_key]
         file = FileManager(file_path, {})
 
-        data = file.load_data()
+        try:
+            data = file.load_data()
+        except FileNotFoundError:
+            print(f"Error: File '{file_path}' not found.")
+            data = None
+        except ValueError:
+            print(f"Error: File '{file_path}' is not a valid JSON file.")
+            data = None
 
-        rows = ""
-        for item in list(data.values())[0]:
-            rows += "<tr>" + "".join(f"<td>{v}</td>" for v in item.values()) + "</tr>"
+        if data:
+            values = list(data.values())
+            records = values[0] if values and isinstance(values[0], list) else []
 
-        headers = "".join(f"<th>{k}</th>" for k in list(data.values())[0][0].keys())
+            if not records:
+                print(f"No records found in '{file_path}'.")
+            else:
+                rows = ""
+                for item in records:
+                    rows += "<tr>" + "".join(f"<td>{html_lib.escape(str(v))}</td>" for v in item.values()) + "</tr>"
 
-        html = f"""
-        <html>
-        <body>
-        <table border="1">
-        <tr>{headers}</tr>
-        {rows}
-        </table>
-        </body>
-        </html>
-        """
+                headers = "".join(f"<th>{html_lib.escape(str(k))}</th>" for k in records[0].keys())
 
-        with open("view.html", "w") as f:
-            f.write(html)
+                html_content = f"""
+                <html>
+                <body>
+                <table border="1">
+                <tr>{headers}</tr>
+                {rows}
+                </table>
+                </body>
+                </html>
+                """
 
-        webbrowser.open("view.html")  # ← פותח בדפדפן אוטומטית
+                # וודאות שתיקיית files קיימת
+                os.makedirs("files", exist_ok=True)
+                output_file = os.path.join("files", "view.html")
+
+                with open(output_file, "w", encoding="utf-8") as f:
+                    f.write(html_content)
+
+                webbrowser.open(output_file)
+        elif data is not None:
+            print(f"No data found in '{file_path}'.")

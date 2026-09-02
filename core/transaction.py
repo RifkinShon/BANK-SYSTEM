@@ -10,7 +10,6 @@ class TransactionUtils:
     @staticmethod
     def amount(amount):
         try:
-            # נסה להמיר למספר שלם
                 amount = int(amount)
         except ValueError:
             try:
@@ -45,7 +44,7 @@ class TransactionUtils:
         star_account_number_To=str(Account_number_To).strip()
         if  len(star_account_number_To) <= 11 and star_account_number_To[0:3]=="356":
             return star_account_number_To
-        raise ValueError("num have to follow standard.")
+        raise ValueError("account number have to follow standard 1-9 numbers and -(C,S,L).")
  
 
 
@@ -130,7 +129,6 @@ class Transaction:
 
 
     def change_balance(self):
-       print(f"{self.account_info["balance"]}balance before ") 
        if self.status == "COMPLETED":
         if self.transactionType == "DEPOSIT":
          self.account_info["balance"] += self.amount
@@ -211,14 +209,13 @@ class TransactionTo(Transaction):
             if self.status=="COMPLETED":
                 self.account_info["balance"] -= self.amount+ self.fee
                 to_find_account_To[1]["balance"] += self.amount
-                account_info=self.account_info["balance"]
+                account_balance=self.account_info["balance"]
                 if to_find_account_To[1]["account_type"]=="LOAN":#פונקציה שנותנת לבנק את הכסף מהלוואה
                     BANK.loan_money(self.amount)
-                return  account_info,to_find_account_To[1]["balance"]
+                return  account_balance,to_find_account_To[1]["balance"]
             else:
                 return  self.account_info["balance"],to_find_account_To[1]["balance"]
 
-    
     def cheack_account_status(self):
         accountTO=self.to_dict_account_transaction_TO()
         if (accountTO["account_type"] =="LOAN" or accountTO["account_type"] =="SAVINGS")  and accountTO["status"] =="CLOSED":

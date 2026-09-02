@@ -100,7 +100,7 @@ else:
             "transactions": [],
             "credit_score": dict_customer["credit_score"],
             "created_time": dict_customer["created_time"],
-            "updata_time": dict_customer["created_time"] 
+            "update_time": dict_customer["created_time"] 
         }
         
         

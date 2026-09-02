@@ -373,7 +373,6 @@ btn_back3.place(relx=0.75, rely=0.88, anchor=CENTER)
 
 
 
-
 # נניח ש-tabview מוגדר כמשתנה גלובלי או ששומרים אותו נכון
 def tabview_def(TRUE_or_FALSE, dict_customer, refreash):
 
@@ -421,7 +420,8 @@ def tabview_def(TRUE_or_FALSE, dict_customer, refreash):
     )
     label_tab2.place(relx=0.5, rely=0.4, anchor=CENTER)
 
-    label_tab3 = CTkLabel(master=tab1, text=f"Balance: ${checking_dict['balance']:.2f}", font=("Arial", 24, "bold"), text_color=ACCENT_COLOR)
+    label_tab3 = CTkLabel(master=tab1, text=f"Balance: ${checking_dict['balance']:.2f}", font=("Arial", 24, "bold"), text_color="#bcffd9"
+)
     label_tab3.place(relx=0.5, rely=0.6, anchor=CENTER)
 
 

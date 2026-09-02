@@ -4,24 +4,8 @@ import os
 
 
 
-import os
-import json
 
-def load_data(self):
-    try:
-        # בדיקה האם הקובץ קיים וגם ריק
-        if os.path.exists(self.file_path) and os.path.getsize(self.file_path) == 0:
-            return {} # מחזיר מילון ריק במקום לקרוס
-            
-        with open(self.file_path, 'r') as file:
-            data_dict = json.load(file)
-            print(f"Data loaded successfully from '{self.file_path}'")
-            return data_dict
-            
-    except FileNotFoundError:
-        raise FileNotFoundError(f"File '{self.file_path}' not found.")
-    except json.JSONDecodeError:
-        raise ValueError(f"File '{self.file_path}' is not a valid JSON file.")
+   
 class FileManager:
     
     def __init__(self, file_path,data_dict):
@@ -29,22 +13,31 @@ class FileManager:
         self.data_dict=data_dict
 
 
-    def ensure_file_exists(self):
-     import os
-     import json
-     if not os.path.exists(self.file_path):
-         print(f"JSON file '{self.file_path}' does not exist. Creating a new file.")
-         with open(self.file_path, 'w') as file:
-             json.dump({}, file, indent=2)
-         print(f"JSON file '{self.file_path}' has been created successfully")
-         return
-     else:
-        print(f"JSON file '{self.file_path}' already exists.")
+
+   
+    def ensure_file_not_empty(self):
+        if os.path.exists(self.file_path) and os.path.getsize(self.file_path) == 0:
+            print(f"JSON file '{self.file_path}' is empty. Initializing with an empty dictionary.")
+            return True
+        else:
+            print(f"JSON file '{self.file_path}' is not empty.")
+            return False
+
 
 
    
-
-
+    def ensure_file_exists(self):
+        import os
+        import json
+        if not os.path.exists(self.file_path):
+            print(f"JSON file '{self.file_path}' does not exist. Creating a new file.")
+            with open(self.file_path, 'w') as file:
+                json.dump({}, file, indent=2)
+            print(f"JSON file '{self.file_path}' has been created successfully")
+            return True
+        else:
+            print(f"JSON file '{self.file_path}' already exists.")
+            return False
 
 
     def save_data(self):
@@ -101,12 +94,15 @@ class FileManager:
                     item for item in existing[key]
                     if item.get("account_number") != account_to_delete
                 ]
-        
-        with open(self.file_path, 'w') as file:
-            json.dump(existing, file, indent=2)
-            print(f"JSON file '{self.file_path}'   deleted data successfully")
+        try:
+            with open(self.file_path, 'w') as file:
+                json.dump(existing, file, indent=2)
+                print(f"JSON file '{self.file_path}'   deleted data successfully")
+                return
+        except Exception as e:
+            print(f"An error occurred while deleting data from '{self.file_path}': {e}")
             return
-        print((f"JSON file '{self.file_path}' has not deleted data successfully"))
+
 
 
 

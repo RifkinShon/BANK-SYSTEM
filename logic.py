@@ -111,7 +111,7 @@ def create_account(dict_customer):
             "transactions": [],
             "credit_score": dict_customer["credit_score"],
             "created_time": dict_customer["created_time"],
-            "updata_time": dict_customer["created_time"] 
+            "update_time": dict_customer["created_time"] 
         }
         
         
@@ -235,11 +235,19 @@ def transaction(common_transaction, dict_customer, checking_dict, saving_dict, l
     account_saving = FileManager("files/accounts.json", {"accounts": [saving_dict]})
     account_loan = FileManager("files/accounts.json", {"accounts": [loan_dict]})
 
-
     transactions = FileManager("files/transactions.json", {"transactions": [transaction_dict]})
-    Bank=FileManager("files/BANK_MONEY.json", {"BANK_MONEY": [{"total": 0}]})
+    bank_data=FileManager("files/BANK_MONEY.json", None)
+    if bank_data.ensure_file_exists() :
+        bank_data=FileManager("files/BANK_MONEY.json", {"BANK_MONEY": [{"total": 0}]})
+        bank_data.save_data()
 
-    files_list = [customer,account_checking ,account_saving,account_loan,transactions,Bank]
+    elif bank_data.ensure_file_not_empty():
+         bank_data=FileManager("files/BANK_MONEY.json", {"BANK_MONEY": [{"total": 0}]})
+         bank_data.save_data()
+
+    
+
+    files_list = [customer,account_checking ,account_saving,account_loan,transactions,bank_data]
     
 
 
@@ -256,7 +264,6 @@ def transaction(common_transaction, dict_customer, checking_dict, saving_dict, l
     #----------
     #BANK_MONEY
     #--------- 
-    Bank.save_data()
     BANK.BANK_MONEY(T1.fee,T1.transactionType)
     BANK.loan_interest()
     BANK.saving_interest()
@@ -348,13 +355,22 @@ def transaction_TO(common_transaction, dict_customer, checking_dict, saving_dict
         account_saving = FileManager("files/accounts.json", {"accounts": [saving_dict]})
         account_loan = FileManager("files/accounts.json", {"accounts": [loan_dict]})
         accountsTO=FileManager("files/accounts.json", {"accounts": [checking_dict_TO]})
+        
 
 
 
     transactions = FileManager("files/transactions.json", {"transactions": [transaction_dict]})
     transactionsTO=FileManager("files/transactions.json", {"transactions": [transactionTO_dict]})
-    Bank=FileManager("files/BANK_MONEY.json", {"BANK_MONEY": [{"total": 0}]})
-    files_list = [Bank,customer,account_checking ,account_saving,account_loan,transactions,transactionsTO]
+    bank_data=FileManager("files/BANK_MONEY.json", None)
+    if bank_data.ensure_file_exists() :
+        bank_data=FileManager("files/BANK_MONEY.json", {"BANK_MONEY": [{"total": 0}]})
+        bank_data.save_data()
+
+    elif bank_data.ensure_file_not_empty():
+         bank_data=FileManager("files/BANK_MONEY.json", {"BANK_MONEY": [{"total": 0}]})
+         bank_data.save_data()
+    
+    files_list = [customer,account_checking ,account_saving,account_loan,transactions,transactionsTO,bank_data]
     
 
 
@@ -387,7 +403,6 @@ def transaction_TO(common_transaction, dict_customer, checking_dict, saving_dict
     #----------
     #BANK_MONEY
     #--------- 
-    Bank.save_data()
     BANK.BANK_MONEY(T1.fee,T1.transactionType)
     BANK.loan_interest()
     BANK.saving_interest()

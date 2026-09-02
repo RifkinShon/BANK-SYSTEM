@@ -6,7 +6,6 @@ class BANK:
         import os
         import sys
         import json
-        import os
 
         sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -80,7 +79,7 @@ class BANK:
                 print(f"Account {account['account_number']} is closed - skipping")
                 continue
 
-            update_time = account["updata_time"].strip()
+            update_time = account["update_time"].strip()
             update_dt = datetime.strptime(update_time, "%Y-%m-%d")
             months_passed = (now.year - update_dt.year) * 12 + (now.month - update_dt.month)
 
@@ -97,10 +96,10 @@ class BANK:
                 interest_rate = 0.08  
 
             balance = account["balance"]
-            new_balance = round(balance * ((1 + interest_rate) ** months_passed), 2)
+            new_balance = round(balance * ((1 + interest_rate) ** (months_passed / 12)), 2)
             account["balance"] = new_balance
 
-            account["updata_time"] = now.strftime("%Y-%m-%d")
+            account["update_time"] = now.strftime("%Y-%m-%d")
 
             if new_balance >= 0:
                 account["status"] = "CLOSED"
@@ -136,7 +135,7 @@ class BANK:
 
                     continue
 
-                update_time = account["updata_time"].strip()
+                update_time = account["update_time"].strip()
                 update_dt = datetime.strptime(update_time, "%Y-%m-%d")
                 months_passed = (now.year - update_dt.year) * 12 + (now.month - update_dt.month)
 
@@ -158,10 +157,10 @@ class BANK:
                     interest_rate = 0.02  
 
                 balance = account["balance"]
-                new_balance = round(balance * ((1 + interest_rate) ** months_passed), 2)
+                new_balance = round(balance * ((1 + interest_rate) ** (months_passed / 12)), 2)
                 account["balance"] = new_balance
 
-                account["updata_time"] = now.strftime("%Y-%m-%d")
+                account["update_time"] = now.strftime("%Y-%m-%d")
 
                 print(f"Account {account['account_number']}: {balance} → {new_balance} ({months_passed} months, {interest_rate*100}% interest)")
 

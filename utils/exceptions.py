@@ -11,5 +11,7 @@
     TimeoutError("פג תוקף"),            # פג תוקף
     NotImplementedError("לא ממומש"),    # פונקציה שעוד לא ממומשת
     RuntimeError("שגיאת ריצה"),
+    MemoryError("חוסר זיכרון"),         # חוסר זיכרון
+    OverflowError("חריגה"),             # חריגה (overflow)
 ]"""
 

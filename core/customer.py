@@ -67,7 +67,7 @@ class CustomerUtils:
     def created_time():
         from datetime import datetime
         now = datetime.now()
-        return now.strftime("%Y-%m-%d ")
+        return now.strftime("%Y-%m-%d")
     @staticmethod
     def account_type(account_type):
         if account_type in ("CHECKING", "SAVINGS", "LOAN"):
@@ -91,23 +91,29 @@ class CustomerUtils:
         raise ValueError("account number or password not correct")
 
     @staticmethod
-    def login_GUI(account_number,password):
+    def login_GUI(account_number, password):
+        import os
+        import sys
+        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from utils.file_manager import FileManager 
+        
+        # שלב 1: טעינת הקובץ (כאן הגיוני שיהיה try-except למקרה שהקובץ פגום או לא קיים)
         try:
-            import os
-            import sys
-            sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            from utils.file_manager import FileManager 
             data = FileManager("files/customers.json", {"customers": []}).load_data()
-            for customer in data["customers"]:
-                if customer["account_number"] == str(account_number):
-                    print("customers account is correct")
-                    if str(customer["password"]) == str(password):
-                        print("customers password is correct")
-                        print("Login successful.")
-                        return  account_number,password
-            raise ValueError("account number or password not correct")
         except Exception as e:
-                raise ValueError("file processing error") from e
+            raise ValueError("file processing error") from e
+
+        # שלב 2: בדיקת הנתונים (בלי try-except, כדי שהשגיאה המקורית תעבור החוצה)
+        for customer in data.get("customers", []):
+            if str(customer.get("account_number")) == str(account_number):
+                print("customers account is correct")
+                if str(customer.get("password")) == str(password):
+                    print("customers password is correct")
+                    print("Login successful.")
+                    return account_number, password
+                    
+        # אם הגענו לכאן, סימן שהחשבון או הסיסמה לא נמצאו
+        raise ValueError("account number or password not correct")
 class Customer:
     
     def __init__(self, customer_id, name,age, email, phone, account_number,created_time, address,password, role,credit_score):
