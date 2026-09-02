@@ -1,9 +1,27 @@
 
 import json
+import os
 
 
 
+import os
+import json
 
+def load_data(self):
+    try:
+        # בדיקה האם הקובץ קיים וגם ריק
+        if os.path.exists(self.file_path) and os.path.getsize(self.file_path) == 0:
+            return {} # מחזיר מילון ריק במקום לקרוס
+            
+        with open(self.file_path, 'r') as file:
+            data_dict = json.load(file)
+            print(f"Data loaded successfully from '{self.file_path}'")
+            return data_dict
+            
+    except FileNotFoundError:
+        raise FileNotFoundError(f"File '{self.file_path}' not found.")
+    except json.JSONDecodeError:
+        raise ValueError(f"File '{self.file_path}' is not a valid JSON file.")
 class FileManager:
     
     def __init__(self, file_path,data_dict):
@@ -22,6 +40,12 @@ class FileManager:
          return
      else:
         print(f"JSON file '{self.file_path}' already exists.")
+
+
+   
+
+
+
 
     def save_data(self):
         existing = self.load_data()
@@ -42,19 +66,20 @@ class FileManager:
                 return
 
     def load_data(self):
-        import json
         try:
+            # בדיקה האם הקובץ קיים וגם ריק
+            if os.path.exists(self.file_path) and os.path.getsize(self.file_path) == 0:
+                return {} # מחזיר מילון ריק במקום לקרוס
+                
             with open(self.file_path, 'r') as file:
                 data_dict = json.load(file)
                 print(f"Data loaded successfully from '{self.file_path}'")
                 return data_dict
+                
         except FileNotFoundError:
-            print(f"File '{self.file_path}' not found.")
-            return None
+            raise FileNotFoundError(f"File '{self.file_path}' not found.")
         except json.JSONDecodeError:
-            print(f"Error decoding JSON from file '{self.file_path}'.")
-            return None
-        
+            raise ValueError(f"File '{self.file_path}' is not a valid JSON file.")
 
 
     def delete_data(self):

@@ -37,7 +37,6 @@ def Customer_login(account_number,password):
     data=CustomerUtils.login(account_number,password)
     customer = Customer.from_dict(data) 
     dict_customer_login=customer.to_dict_customer()
-    customer_login = FileManager("files/customers.json", {"customers": [dict_customer_login]})
     return dict_customer_login
 
 
@@ -238,7 +237,9 @@ def transaction(common_transaction, dict_customer, checking_dict, saving_dict, l
 
 
     transactions = FileManager("files/transactions.json", {"transactions": [transaction_dict]})
-    files_list = [customer,account_checking ,account_saving,account_loan,transactions]
+    Bank=FileManager("files/BANK_MONEY.json", {"BANK_MONEY": [{"total": 0}]})
+
+    files_list = [customer,account_checking ,account_saving,account_loan,transactions,Bank]
     
 
 
@@ -246,7 +247,6 @@ def transaction(common_transaction, dict_customer, checking_dict, saving_dict, l
     for file in files_list:
      file.ensure_file_exists()  
 
-    """account_checking.save_data()"""    
     account_checking.save_data()
     account_saving.save_data()
     account_loan.save_data()
@@ -256,6 +256,7 @@ def transaction(common_transaction, dict_customer, checking_dict, saving_dict, l
     #----------
     #BANK_MONEY
     #--------- 
+    Bank.save_data()
     BANK.BANK_MONEY(T1.fee,T1.transactionType)
     BANK.loan_interest()
     BANK.saving_interest()
@@ -352,7 +353,8 @@ def transaction_TO(common_transaction, dict_customer, checking_dict, saving_dict
 
     transactions = FileManager("files/transactions.json", {"transactions": [transaction_dict]})
     transactionsTO=FileManager("files/transactions.json", {"transactions": [transactionTO_dict]})
-    files_list = [customer,account_checking ,account_saving,account_loan,transactions,transactionsTO]
+    Bank=FileManager("files/BANK_MONEY.json", {"BANK_MONEY": [{"total": 0}]})
+    files_list = [Bank,customer,account_checking ,account_saving,account_loan,transactions,transactionsTO]
     
 
 
@@ -385,6 +387,7 @@ def transaction_TO(common_transaction, dict_customer, checking_dict, saving_dict
     #----------
     #BANK_MONEY
     #--------- 
+    Bank.save_data()
     BANK.BANK_MONEY(T1.fee,T1.transactionType)
     BANK.loan_interest()
     BANK.saving_interest()

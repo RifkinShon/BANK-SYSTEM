@@ -81,7 +81,7 @@ class AccountUtils:
 
         missing = [k for k, v in result.items() if v is None]
         if missing:
-            raise ValueError(f"No accounts of the following types were found: {', '.join(missing)}")
+            raise ValueError(f"No accounts of the following types were found: {', '.join(missing)} please login to fix the issue")
 
         return result
 
