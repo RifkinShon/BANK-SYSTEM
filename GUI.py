@@ -200,7 +200,7 @@ if side_image:
     img_label1 = CTkLabel(master=frame, text="", image=side_image)
     img_label1.place(relx=0.25, rely=0.5, anchor=CENTER)
 
-label = CTkLabel(master=frame, text="Hello, World!", font=("Arial", 24, "bold"), text_color=TEXT_COLOR)
+label = CTkLabel(master=frame, text="Hello, dear customer!", font=("Arial", 24, "bold"), text_color=TEXT_COLOR)
 label.place(relx=0.75, rely=0.3, anchor=CENTER)
 
 combo_box = CTkComboBox(
